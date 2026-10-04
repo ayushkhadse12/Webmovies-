@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment secrets (NEVER push this)
+.env
+
+# Uploaded videos (too large for GitHub — host separately)
+data/uploads/*.mp4
+data/uploads/*.mkv
+data/uploads/*.avi
+data/uploads/*.webm
+assets/clips/*.mp4
+assets/clips/*.mkv
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Editor files
+.vscode/
+*.swp
+*.swo

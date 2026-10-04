@@ -1,0 +1,30 @@
+[
+  {
+    "id": "8bff01b5-b485-4a56-bb98-4b40200d0a6c",
+    "email": "test@test.com",
+    "name": "test",
+    "passwordHash": "$2a$10$bt79Q.TEnHFanrJbg/0KauRkrpnOKStneFbstWsd0UPNz1EjkJJMG",
+    "downloads": []
+  },
+  {
+    "id": "58765f3e-e916-47d7-a5f6-5e91e3c65ee5",
+    "email": "ayushadmin.com",
+    "name": "admin",
+    "passwordHash": "$2a$10$Ok67SnSyEyp7q7LWWBTqm.mRkmA07H3KKzfNtgIgIorQ7aoAXqD6O",
+    "downloads": []
+  },
+  {
+    "id": "5cdabef1-05a3-4e6d-bf75-b68a1f8804c7",
+    "email": "ayushkhadse12@gmail.com",
+    "name": "Ayush",
+    "passwordHash": "$2a$10$v.pcNxdtRCVwLLBKEU6lJucxGgAZJXV4lrj8g4GIYOpv1GrOJJx1u",
+    "downloads": []
+  },
+  {
+    "id": "1cc5c3e6-44b7-4e79-a686-68320c1aa60a",
+    "email": "ayush@gmail.com",
+    "name": "Ayush",
+    "passwordHash": "$2a$10$Gpf1Wm.Oj2hKRSDmgIp1fOn.Fxpt3SVTR1TJdGzY8TDledrPOEXx2",
+    "downloads": []
+  }
+]

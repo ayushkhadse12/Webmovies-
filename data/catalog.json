@@ -1,0 +1,302 @@
+{
+  "items": [
+    {
+      "id": "big-buck-bunny",
+      "kind": "movie",
+      "title": "Big Buck Bunny",
+      "year": "2008",
+      "rating": "7.5",
+      "description": "A large and friendly rabbit gets his revenge on three bullying rodents.",
+      "poster": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Big_buck_bunny_poster_big.jpg/640px-Big_buck_bunny_poster_big.jpg",
+      "backdrop": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Big_buck_bunny_poster_big.jpg/1280px-Big_buck_bunny_poster_big.jpg",
+      "duration": "10m",
+      "media": {
+        "provider": "direct",
+        "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        "downloadUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      },
+      "showOnHome": false
+    },
+    {
+      "id": "avengers-endgame",
+      "kind": "movie",
+      "title": "Avengers: Endgame",
+      "year": "2019",
+      "rating": "8.4",
+      "description": "The Avengers make one final attempt to undo the devastation caused by Thanos.",
+      "poster": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1280&q=80",
+      "backdrop": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1280&q=80",
+      "duration": "3h 1m",
+      "media": {
+        "provider": "direct",
+        "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "downloadUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+      }
+    },
+    {
+      "id": "spider-man-brand-new-day",
+      "kind": "movie",
+      "title": "Spider-Man: Brand New Day",
+      "year": "2026",
+      "rating": "8.0",
+      "description": "Peter Parker begins a new chapter as Spider-Man.",
+      "poster": "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=1280&q=80",
+      "backdrop": "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=1280&q=80",
+      "duration": "2h",
+      "media": {
+        "provider": "direct",
+        "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        "downloadUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+      }
+    },
+    {
+      "id": "inception",
+      "kind": "movie",
+      "title": "Inception",
+      "year": "2010",
+      "rating": "8.8",
+      "description": "A skilled team enters the dreams of others to perform an impossible mission.",
+      "poster": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&q=80",
+      "backdrop": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&q=80",
+      "duration": "2h 28m",
+      "media": {
+        "provider": "direct",
+        "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        "downloadUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+      }
+    },
+    {
+      "id": "dark-knight",
+      "kind": "movie",
+      "title": "The Dark Knight",
+      "year": "2008",
+      "rating": "9.0",
+      "description": "Batman faces a criminal mastermind who throws Gotham into chaos.",
+      "poster": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1280&q=80",
+      "backdrop": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1280&q=80",
+      "duration": "2h 32m",
+      "media": {
+        "provider": "direct",
+        "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+        "downloadUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+      },
+      "showOnHome": true
+    },
+    {
+      "id": "breaking-bad",
+      "kind": "series",
+      "title": "Breaking Bad",
+      "year": "2008",
+      "rating": "9.5",
+      "description": "A chemistry teacher enters the dangerous world of manufacturing.",
+      "poster": "https://image.tmdb.org/t/p/w780/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/bsNm9z2TJfe0WO3RedPGWQ8mG1X.jpg",
+      "seasons": [
+        {
+          "number": 1,
+          "title": "Season 1",
+          "poster": "https://image.tmdb.org/t/p/w1280/bsNm9z2TJfe0WO3RedPGWQ8mG1X.jpg",
+          "episodes": [
+            {
+              "id": "breaking-bad-s1-e1",
+              "number": 1,
+              "title": "Pilot",
+              "description": "Walter White begins a dangerous new journey.",
+              "duration": "58m",
+              "poster": "https://image.tmdb.org/t/p/w780/ydlY3iPfeOAvu8gVqrxPoMvzNCn.jpg",
+              "media": {
+                "provider": "direct",
+                "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
+              }
+            },
+            {
+              "id": "breaking-bad-s1-e2",
+              "number": 2,
+              "title": "Cat's in the Bag...",
+              "description": "Walter and Jesse deal with the consequences of their actions.",
+              "duration": "48m",
+              "poster": "https://image.tmdb.org/t/p/w780/tjDNOaafolZS4lGqkQJHCFaGsEb.jpg",
+              "media": {
+                "provider": "direct",
+                "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "game-of-thrones",
+      "kind": "series",
+      "title": "Game of Thrones",
+      "year": "2011",
+      "rating": "9.2",
+      "description": "Powerful families fight for control of the Iron Throne.",
+      "poster": "https://image.tmdb.org/t/p/w780/7WUHnWGx5OO145IRxPDUkQSh4C7.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
+      "seasons": [
+        {
+          "number": 1,
+          "title": "Season 1",
+          "poster": "https://image.tmdb.org/t/p/w1280/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
+          "episodes": [
+            {
+              "id": "game-of-thrones-s1-e1",
+              "number": 1,
+              "title": "Winter Is Coming",
+              "description": "Noble families of Westeros seek control of the Iron Throne.",
+              "duration": "62m",
+              "poster": "https://image.tmdb.org/t/p/w780/9hGF3WUkBf7cSjMg0cdMDHaQBAP.jpg",
+              "media": {
+                "provider": "direct",
+                "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "song-1",
+      "kind": "song",
+      "title": "Kesariya",
+      "artist": "Arijit Singh",
+      "poster": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&q=80",
+      "media": {
+        "provider": "direct",
+        "streamUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+      }
+    },
+    {
+      "id": "song-2",
+      "kind": "song",
+      "title": "Apna Bana Le",
+      "artist": "Arijit Singh",
+      "poster": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&q=80",
+      "media": {
+        "provider": "direct",
+        "streamUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+      }
+    },
+    {
+      "id": "hanuman-ansh",
+      "kind": "movie",
+      "title": "Hanuman Ansh",
+      "year": "2026",
+      "rating": "8.4",
+      "description": "A grieving boy seeks God to meet his departed mother, and in finding the divine, learns to serve humanity with miracles of love, food and silent blessings, becoming Hanuman Ansh, Neem Karoli Baba.",
+      "poster": "https://assets-in.bmscdn.com/iedb/movies/images/mobile/listing/xxlarge/hanuman-ansh-et00507738-1787130927.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w780/tKYOK8iMxkhJhug3LJ2yvC5QY8M.jpg",
+      "duration": "150m",
+      "media": {
+        "provider": "local",
+        "filename": "video-1788699691744-0-7819019242445151.mkv"
+      },
+      "showOnHome": true
+    },
+    {
+      "id": "dhamaal-4",
+      "kind": "movie",
+      "title": "Dhamaal 4",
+      "year": "2026",
+      "rating": "4.3",
+      "description": "The Dhamaal boys are back for another treasure hunt, facing hilarious challenges in their quest for the Treasure of Life.",
+      "poster": "https://images.goodreturns.in/img/2026/07/dhamaal41-44051783723341.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/95sjD0dRajtU6SKD6Gq6PtrGoGY.jpg",
+      "duration": "",
+      "media": {
+        "provider": "direct",
+        "streamUrl": "https://archive.org/download/dhamaal-4.mp4/Dhamaal%204%20%282026%29%20Bollywood%20Hindi%28DDP5.1-640Kbps%29%20Movie%20HD%201080p%20NF%20WEB-DL%20ESub.mp4",
+        "downloadUrl": "https://archive.org/download/dhamaal-4.mp4/Dhamaal%204%20%282026%29%20Bollywood%20Hindi%28DDP5.1-640Kbps%29%20Movie%20HD%201080p%20NF%20WEB-DL%20ESub.mp4"
+      },
+      "showOnHome": true
+    }
+  ],
+  "comingSoon": [
+    {
+      "id": "cs-demo-2",
+      "title": "Avengers: Secret Wars",
+      "type": "movie",
+      "poster": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1280&q=80",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "description": "The Multiverse saga reaches its epic conclusion. Every hero. Every villain. One final war.",
+      "seriesId": ""
+    },
+    {
+      "id": "cs-demo-3",
+      "title": "Season 6",
+      "type": "season",
+      "poster": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS9ZGc5-9PUGz8cXcRn7Y4BfYruIihbG-R1bQejtKK-HasqPOcExcCzzc&s=10",
+      "video": "/assets/clips/breaking-bad-preview.mp4",
+      "description": "The next season is on its way.",
+      "seriesId": "breaking-bad"
+    },
+    {
+      "id": "cs-demo-1",
+      "title": "Spider-Man: Brand New Day",
+      "type": "movie",
+      "poster": "https://images.unsplash.com/photo-1635805737707-575885ab0820?w=1280&q=80",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "description": "Peter Parker begins a new chapter as Spider-Man in the most anticipated movie of 2026.",
+      "seriesId": ""
+    }
+  ],
+  "heroSlides": [
+    {
+      "id": "hero-1788109371379",
+      "title": "Dhurandhar",
+      "description": "In the early 2000s, an undercover operative infiltrates Karachi's underworld, breaking into its inner circle to dismantle a violent nexus from within.",
+      "poster": "https://www.deccanchronicle.com/h-upload/2025/12/06/1986986-dhurandhar.webp",
+      "video": "/assets/clips/game-of-thrones-preview.mp4",
+      "mediaId": "",
+      "year": "2025",
+      "rating": "7.3",
+      "type": "Movie",
+      "quality": "HD",
+      "position": 1
+    },
+    {
+      "id": "hero-demo-inception",
+      "title": "Inception",
+      "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+      "poster": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&q=80",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "year": "2010",
+      "rating": "8.8",
+      "type": "Movie",
+      "quality": "4K",
+      "position": 2
+    },
+    {
+      "id": "hero-demo-dark-knight",
+      "title": "The Dark Knight",
+      "description": "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests.",
+      "poster": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1280&q=80",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "year": "2008",
+      "rating": "9.0",
+      "type": "Movie",
+      "quality": "HD",
+      "position": 3
+    },
+    {
+      "id": "hero-demo-avengers",
+      "title": "Avengers: Endgame",
+      "description": "After the devastating events of Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more.",
+      "poster": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1280&q=80",
+      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+      "year": "2019",
+      "rating": "8.4",
+      "type": "Movie",
+      "quality": "4K",
+      "position": 4
+    }
+  ],
+  "settings": {
+    "csCardSize": "large",
+    "seasonCsCardSize": "xlarge",
+    "movieCardSize": "medium",
+    "seriesCardSize": "medium",
+    "songCardSize": "medium"
+  }
+}

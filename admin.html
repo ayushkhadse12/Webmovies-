@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>WebMovies Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+
+    <!-- ── LOGIN GATE ─────────────────────────────────────────────── -->
+    <div id="loginGate" class="login-gate">
+      <div class="login-card">
+        <div class="login-brand"><span>web</span><strong>movies</strong></div>
+        <p class="login-eyebrow">ADMIN PANEL</p>
+        <h1 class="login-title">Sign in</h1>
+        <p class="login-sub">Enter your admin token to access the catalog tools.</p>
+        <form id="loginForm" novalidate>
+          <label class="login-label">
+            Admin Token
+            <div class="password-wrap">
+              <input id="loginToken" type="password" autocomplete="current-password"
+                     placeholder="Paste your ADMIN_TOKEN…" required />
+              <button type="button" id="toggleLoginToken" class="eye-btn" aria-label="Show token">
+                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </label>
+          <button id="loginButton" class="login-btn" type="submit">Unlock Admin Panel</button>
+          <p id="loginMessage" class="login-message" aria-live="polite"></p>
+        </form>
+        <a href="index.html" class="login-home-link">← Back to home</a>
+      </div>
+    </div>
+
+    <!-- ── ADMIN PANEL ────────────────────────────────────────────── -->
+    <div id="adminPanel" class="admin-panel">
+
+      <!-- Header -->
+      <header class="admin-header">
+        <a href="index.html" class="brand"><span>web</span><strong>movies</strong></a>
+        <div class="header-right">
+          <span class="admin-badge">Admin</span>
+          <button id="logoutBtn" class="logout-btn">Sign out</button>
+          <a href="index.html" class="back-link">← Library</a>
+        </div>
+      </header>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           DASHBOARD HOME
+           ═══════════════════════════════════════════════════════════ -->
+      <main class="dash-home" id="dashHome">
+        <div class="dash-hero">
+          <p class="eyebrow">COMMAND CENTER</p>
+          <h1>Admin Dashboard</h1>
+          <p class="dash-sub">Manage your entire catalog, hero banners, coming soon, and settings from one place.</p>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-row" id="statsRow">
+          <div class="stat-chip"><span class="stat-num" id="statMovies">—</span><span class="stat-label">Movies</span></div>
+          <div class="stat-chip"><span class="stat-num" id="statSeries">—</span><span class="stat-label">Series</span></div>
+          <div class="stat-chip"><span class="stat-num" id="statCS">—</span><span class="stat-label">Coming Soon</span></div>
+          <div class="stat-chip"><span class="stat-num" id="statHero">—</span><span class="stat-label">Hero Posters</span></div>
+        </div>
+
+        <!-- Section Cards Grid -->
+        <div class="dash-grid">
+
+          <button class="dash-card" data-section="sec-movies">
+            <div class="dash-card-icon" style="--accent: #ff1744;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/><line x1="17" y1="17" x2="22" y2="17"/></svg>
+            </div>
+            <h3>Movies & Series</h3>
+            <p>Add movies or web series. Posters, info & episodes auto-fetched from TMDb.</p>
+            <span class="dash-card-arrow">→</span>
+          </button>
+
+          <button class="dash-card" data-section="sec-coming-soon">
+            <div class="dash-card-icon" style="--accent: #ff9100;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <h3>Coming Soon</h3>
+            <p>Add upcoming movies or series with hover video previews on the homepage.</p>
+            <span class="dash-card-arrow">→</span>
+          </button>
+
+          <button class="dash-card" data-section="sec-hero">
+            <div class="dash-card-icon" style="--accent: #ffca28;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <h3>Hero Posters</h3>
+            <p>Add big banner posters with hover trailer previews to the homepage slider.</p>
+            <span class="dash-card-arrow">→</span>
+          </button>
+
+          <button class="dash-card" data-section="sec-settings">
+            <div class="dash-card-icon" style="--accent: #448aff;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <h3>Settings</h3>
+            <p>Change homepage card sizes, layouts and visual preferences.</p>
+            <span class="dash-card-arrow">→</span>
+          </button>
+
+          <button class="dash-card dash-card-danger" data-section="sec-manage">
+            <div class="dash-card-icon" style="--accent: #ff1744;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </div>
+            <h3>Manage Catalog</h3>
+            <p>Delete items, reorder hero posters, and manage all entries.</p>
+            <span class="dash-card-arrow">→</span>
+          </button>
+
+        </div>
+      </main>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           SECTION PAGES (each one is a full page, hidden by default)
+           ═══════════════════════════════════════════════════════════ -->
+
+      <!-- ── MOVIES & SERIES ──────────────────────────────────────── -->
+      <main class="section-page" id="sec-movies">
+        <div class="section-top">
+          <button class="back-to-dash" data-back>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Dashboard
+          </button>
+          <div>
+            <p class="eyebrow">CATALOG AUTOMATION</p>
+            <h2>Add a movie or web series</h2>
+          </div>
+        </div>
+
+        <section class="info-guide">
+          <h3>📖 How it works</h3>
+          <ul>
+            <li><strong>Auto-fetch:</strong> Just enter the title — poster, description, rating, year, and episodes are <em>automatically fetched</em> from TMDb. You can override the poster with a custom URL.</li>
+            <li><strong>TMDb ID:</strong> If the auto-search picks the wrong movie, enter the exact TMDb ID from <a href="https://www.themoviedb.org" target="_blank">themoviedb.org</a>.</li>
+            <li><strong>Movies:</strong> Select <em>TeraBox</em> or <em>Direct URL</em> as provider. For TeraBox, give the file path (e.g. <code>/WebMovies/Movies/Inception.mp4</code>). For multi-part, separate with commas.</li>
+            <li><strong>Series:</strong> All seasons &amp; episodes are auto-imported from TMDb. Attach video files via the Episode Media Map JSON.</li>
+            <li><strong>Video sources:</strong> All videos can be hosted on TeraBox, Google Drive (direct link), or any cloud with a direct MP4 URL.</li>
+          </ul>
+        </section>
+
+        <section class="admin-card">
+          <form id="importForm">
+            <div class="field-grid">
+              <label>
+                Type
+                <select id="mediaKind" required>
+                  <option value="movie">Movie</option>
+                  <option value="series">Web series</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              Title
+              <input id="title" type="text" required placeholder="For example: Avengers: Endgame" />
+            </label>
+
+            <label>
+              TMDb ID <span>(optional, avoids a wrong search match)</span>
+              <input id="tmdbId" type="number" min="1" inputmode="numeric" placeholder="Leave blank to search by title" />
+            </label>
+
+            <label>
+              Custom Poster URL <span>(optional — overrides auto-fetched TMDB poster)</span>
+              <input id="customPoster" type="url" placeholder="https://example.com/custom-poster.jpg" />
+            </label>
+
+            <div id="movieMediaFields">
+              <label>
+                Media provider
+                <select id="mediaProvider">
+                  <option value="terabox">TeraBox</option>
+                  <option value="direct">Direct licensed URL</option>
+                  <option value="local">Upload from this laptop</option>
+                </select>
+              </label>
+
+              <label id="teraBoxPathField" style="margin-top:18px;">
+                TeraBox file path <span>(comma-separated for multi-part videos)</span>
+                <input id="teraBoxPath" type="text" placeholder="/WebMovies/Movies/part1.mp4, /WebMovies/Movies/part2.mp4" />
+              </label>
+
+              <label id="directUrlField" hidden style="margin-top:18px;">
+                Direct MP4 or audio URL
+                <input id="directUrl" type="url" placeholder="https://media.example.com/example.mp4" />
+              </label>
+
+              <label id="localFileField" hidden style="margin-top:18px;">
+                Video file from this laptop
+                <input id="localFile" type="file" accept="video/*,audio/*" />
+              </label>
+              <p id="localFileHelp" class="field-help" hidden>The selected file is uploaded to this WebMovies server and can then be streamed by users.</p>
+            </div>
+
+            <div id="seriesMediaFields" hidden>
+              <label>
+                Episode media map <span>(optional during first import)</span>
+                <textarea id="episodeMedia" rows="7" spellcheck="false" placeholder='{"1-1":{"provider":"terabox","path":"/WebMovies/Series/Title/S01E01.mp4"}}'></textarea>
+              </label>
+              <p class="field-help">The series information and posters are automatic. You can attach TeraBox episode paths now or add them later.</p>
+            </div>
+
+            <button id="importButton" class="import-button" type="submit">Fetch details and add to catalog</button>
+            <p id="formMessage" class="form-message" aria-live="polite"></p>
+          </form>
+        </section>
+      </main>
+
+      <!-- ── COMING SOON ──────────────────────────────────────────── -->
+      <main class="section-page" id="sec-coming-soon">
+        <div class="section-top">
+          <button class="back-to-dash" data-back>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Dashboard
+          </button>
+          <div>
+            <p class="eyebrow">COMING SOON</p>
+            <h2>Add upcoming media</h2>
+          </div>
+        </div>
+
+        <section class="info-guide">
+          <h3>📖 How it works</h3>
+          <ul>
+            <li><strong>Auto-fetch:</strong> Enter the title — poster and description are <em>automatically fetched</em> from TMDb. You can override the poster URL.</li>
+            <li><strong>Hover preview video:</strong> Add a short trailer or clip URL. When users hover on the card, the video plays automatically. Use any direct MP4 link from TeraBox, cloud storage, etc.</li>
+            <li><strong>Types:</strong> Choose "Movie" for upcoming movies, "New Series" for new series, or "New Season" for an existing series getting a new season.</li>
+            <li><strong>Card size:</strong> You can change the size of Coming Soon cards in <strong>Settings</strong>.</li>
+          </ul>
+        </section>
+
+        <section class="admin-card">
+          <form id="comingSoonForm">
+            <div class="field-grid">
+              <label>
+                Type
+                <select id="csType" required>
+                  <option value="movie">Movie</option>
+                  <option value="series">New Series</option>
+                  <option value="season">New Season (for existing series)</option>
+                </select>
+              </label>
+            </div>
+
+            <label id="csSeriesIdField" hidden>
+              Target Series ID
+              <input id="csSeriesId" type="text" placeholder="e.g. breaking-bad" />
+            </label>
+
+            <label>
+              Title
+              <input id="csTitle" type="text" required placeholder="Title of the upcoming media" />
+            </label>
+
+            <label>
+              Description
+              <textarea id="csDescription" rows="2" placeholder="Brief description..."></textarea>
+            </label>
+
+            <label>
+              Poster URL <span>(optional — will auto-fetch from TMDB if left blank!)</span>
+              <input id="csPoster" type="url" placeholder="https://example.com/poster.jpg" />
+            </label>
+
+            <label>
+              Direct Video URL <span>(optional — plays on hover as preview)</span>
+              <input id="csVideo" type="url" placeholder="https://example.com/trailer.mp4" />
+            </label>
+
+            <button id="csSubmitButton" class="import-button" type="submit">Add to Coming Soon</button>
+            <p id="csFormMessage" class="form-message" aria-live="polite"></p>
+          </form>
+        </section>
+      </main>
+
+      <!-- ── HERO POSTERS ─────────────────────────────────────────── -->
+      <main class="section-page" id="sec-hero">
+        <div class="section-top">
+          <button class="back-to-dash" data-back>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Dashboard
+          </button>
+          <div>
+            <p class="eyebrow">HERO BANNER</p>
+            <h2>Add custom hero poster</h2>
+          </div>
+        </div>
+
+        <section class="info-guide">
+          <h3>📖 How it works</h3>
+          <ul>
+            <li><strong>Auto-fetch:</strong> Enter the movie/series title — poster (backdrop) and description are <em>automatically fetched</em> from TMDb.</li>
+            <li><strong>Hover preview video:</strong> Add a trailer/clip URL. When users hover over the hero poster, the video plays as a preview. Use any direct MP4 link.</li>
+            <li><strong>Position:</strong> Set 0 for first, 1 for second, etc. Leave blank for last. Reorder with ↑↓ buttons in <strong>Manage Catalog</strong>.</li>
+            <li><strong>Big posters:</strong> These are the large full-width banners at the top of the homepage that auto-rotate in a slider.</li>
+          </ul>
+        </section>
+
+        <section class="admin-card">
+          <form id="heroSlideForm">
+            <label>
+              Title
+              <input id="heroTitleInput" type="text" required placeholder="Title of featured banner (e.g. Inception)" />
+            </label>
+
+            <label>
+              Description
+              <textarea id="heroDescInput" rows="2" placeholder="Brief description for hero banner..."></textarea>
+            </label>
+
+            <label>
+              Poster / Backdrop URL <span>(optional — auto-fetched from TMDB if left blank)</span>
+              <input id="heroPosterInput" type="url" placeholder="https://example.com/backdrop.jpg" />
+            </label>
+
+            <label>
+              Hover Preview Video URL <span>(optional MP4 clip — plays on hover)</span>
+              <input id="heroVideoInput" type="url" placeholder="https://example.com/preview.mp4" />
+            </label>
+
+            <label>
+              Position <span>(optional — 0 for first, leave blank for last)</span>
+              <input id="heroPositionInput" type="number" min="0" placeholder="e.g. 0" />
+            </label>
+
+            <button id="heroSubmitButton" class="import-button" type="submit">Add Hero Poster</button>
+            <p id="heroFormMessage" class="form-message" aria-live="polite"></p>
+          </form>
+        </section>
+      </main>
+
+      <!-- ── SETTINGS ─────────────────────────────────────────────── -->
+      <main class="section-page" id="sec-settings">
+        <div class="section-top">
+          <button class="back-to-dash" data-back>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Dashboard
+          </button>
+          <div>
+            <p class="eyebrow">PREFERENCES</p>
+            <h2>Homepage Settings</h2>
+          </div>
+        </div>
+
+        <section class="info-guide">
+          <h3>📖 How it works</h3>
+          <ul>
+            <li>General homepage preferences will appear here as new features are added.</li>
+            <li>Poster sizes are now managed directly inside <strong>Manage Catalog</strong>.</li>
+          </ul>
+        </section>
+
+        <section class="admin-card">
+          <p style="color: var(--muted); text-align: center; padding: 20px;">Poster size controls have been moved to the <strong>Manage Catalog</strong> section for easier access.</p>
+        </section>
+      </main>
+
+      <!-- ── MANAGE CATALOG ───────────────────────────────────────── -->
+      <main class="section-page" id="sec-manage">
+        <div class="section-top">
+          <button class="back-to-dash" data-back>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Dashboard
+          </button>
+          <div>
+            <p class="eyebrow">DANGER ZONE</p>
+            <h2>Manage Catalog</h2>
+          </div>
+        </div>
+
+        <section class="info-guide">
+          <h3>📖 How it works</h3>
+          <ul>
+            <li><strong>Delete:</strong> Click "Delete" next to any item to permanently remove it from the catalog.</li>
+            <li><strong>Reorder:</strong> Use ↑↓ arrows to change item order on the homepage.</li>
+            <li><strong>Poster Sizes:</strong> Change how big posters appear on the homepage for each section.</li>
+            <li>Items are grouped: Coming Soon → Hero Posters → Movies → Web Series → Songs.</li>
+          </ul>
+        </section>
+
+        <section class="admin-card">
+          <h3 style="margin: 0 0 14px; font-family: Poppins, sans-serif; font-size: 15px; color: var(--text);">📐 Homepage Poster Sizes</h3>
+          <form id="settingsForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <label>
+              Movies
+              <select id="movieCardSizeInput">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+              </select>
+            </label>
+            <label>
+              Web Series
+              <select id="seriesCardSizeInput">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+              </select>
+            </label>
+            <label>
+              Songs
+              <select id="songCardSizeInput">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+              </select>
+            </label>
+            <label>
+              Coming Soon
+              <select id="csCardSizeInput">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+              </select>
+            </label>
+            <label>
+              Season Coming Soon
+              <select id="seasonCsCardSizeInput">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+              </select>
+            </label>
+            <div style="grid-column: 1 / -1;">
+              <button id="settingsSubmitButton" class="import-button" type="submit" style="width: 100%;">Save Poster Sizes</button>
+              <p id="settingsFormMessage" class="form-message" aria-live="polite"></p>
+            </div>
+          </form>
+        </section>
+
+        <section class="admin-card">
+          <div class="manage-list" id="manageList">
+            <p style="color: var(--muted); text-align: center;">Loading catalog items...</p>
+          </div>
+        </section>
+      </main>
+
+      <!-- ── EDIT MODAL ───────────────────────────────────────────── -->
+      <div id="editModal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3>Edit Item</h3>
+            <button class="modal-close" id="closeEditModal">&times;</button>
+          </div>
+          <form id="editForm" class="modal-form">
+            <input type="hidden" id="editItemId" />
+            <label>Title
+              <input type="text" id="editTitle" required />
+            </label>
+            <label>Description
+              <textarea id="editDescription" rows="3"></textarea>
+            </label>
+            <label>Poster URL
+              <input type="url" id="editPoster" />
+            </label>
+            <label id="editVideoLabel">Hover Video / Direct Stream URL
+              <input type="text" id="editVideo" />
+            </label>
+            <button type="submit" id="editSubmitBtn" class="import-button">Save Changes</button>
+            <p id="editFormMessage" class="form-message" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="admin.js"></script>
+  </body>
+</html>

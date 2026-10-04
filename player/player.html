@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#09090b" />
+
+    <title>WebMovies Player</title>
+
+    <link rel="stylesheet" href="player.css" />
+  </head>
+
+  <body>
+    <main class="player-page">
+      <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
+
+      <header class="player-topbar">
+        <button
+          id="playerBack"
+          class="player-icon-button"
+          type="button"
+          aria-label="Go back"
+        >
+          ←
+        </button>
+
+        <div class="player-brand">
+          <span class="brand-web">WEB</span
+          ><span class="brand-movies">MOVIES</span>
+        </div>
+
+        <div class="player-top-actions">
+          <button
+            id="playerDownload"
+            class="player-icon-button"
+            type="button"
+            aria-label="Download"
+            title="Download"
+          >
+            ↓
+          </button>
+        </div>
+      </header>
+
+      <!-- =====================================================
+         VIDEO AREA
+    ====================================================== -->
+
+      <section id="videoContainer" class="video-container">
+        <!-- Poster -->
+        <img id="videoPoster" class="video-poster" src="" alt="Video poster" />
+
+        <!-- Main video buffer A -->
+        <video
+          id="mainVideoPlayer"
+          class="video-player"
+          playsinline
+          preload="metadata"
+        ></video>
+
+        <!-- Main video buffer B -->
+        <video
+          id="secondaryVideoPlayer"
+          class="video-player"
+          playsinline
+          preload="metadata"
+          style="display: none;"
+        ></video>
+
+        <!-- Loading -->
+        <div id="videoLoader" class="video-loader" aria-hidden="true">
+          <div class="loader-spinner"></div>
+        </div>
+
+        <!-- Center Play -->
+        <button
+          id="centerPlayButton"
+          class="center-play-button"
+          type="button"
+          aria-label="Play"
+        >
+          ▶
+        </button>
+
+        <!-- =================================================
+             VIDEO CONTROLS
+        ================================================== -->
+
+        <div id="videoControls" class="video-controls">
+          <!-- Progress -->
+
+          <div class="progress-area">
+            <input
+              id="progressBar"
+              class="progress-bar"
+              type="range"
+              min="0"
+              max="100"
+              value="0"
+              step="0.1"
+              aria-label="Video progress"
+            />
+          </div>
+
+          <!-- Bottom controls -->
+
+          <div class="controls-row">
+            <div class="controls-left">
+              <!-- Play / Pause -->
+
+              <button
+                id="playPauseButton"
+                class="control-button"
+                type="button"
+                aria-label="Play"
+              >
+                ▶
+              </button>
+
+              <!-- Rewind -->
+
+              <button
+                id="rewindButton"
+                class="control-button"
+                type="button"
+                aria-label="Rewind 10 seconds"
+                title="Rewind 10 seconds"
+              >
+                ↶10
+              </button>
+
+              <!-- Forward -->
+
+              <button
+                id="forwardButton"
+                class="control-button"
+                type="button"
+                aria-label="Forward 10 seconds"
+                title="Forward 10 seconds"
+              >
+                10↷
+              </button>
+
+              <!-- Volume -->
+
+              <div class="volume-container" style="display: flex; align-items: center; margin-right: 15px;">
+                <button
+                  id="muteButton"
+                  class="control-button"
+                  type="button"
+                  aria-label="Mute"
+                >
+                  🔊
+                </button>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1" style="width: 80px; cursor: pointer; accent-color: #ff1744; height: 4px;" aria-label="Volume">
+              </div>
+
+              <!-- Time -->
+
+              <div id="timeDisplay" class="time-display">00:00 / 00:00</div>
+            </div>
+
+            <div class="controls-right">
+              <!-- Audio -->
+
+              <button
+                id="audioButton"
+                class="control-button"
+                type="button"
+                aria-label="Audio languages"
+                title="Audio languages"
+              >
+                🎧
+              </button>
+
+              <!-- Subtitles -->
+
+              <button
+                id="subtitleButton"
+                class="control-button"
+                type="button"
+                aria-label="Subtitles"
+                title="Subtitles"
+              >
+                CC
+              </button>
+
+              <!-- Settings -->
+
+              <button
+                id="settingsButton"
+                class="control-button"
+                type="button"
+                aria-label="Settings"
+                title="Settings"
+              >
+                ⚙
+              </button>
+
+              <!-- Fullscreen -->
+
+              <button
+                id="fullscreenButton"
+                class="control-button"
+                type="button"
+                aria-label="Fullscreen"
+                title="Fullscreen"
+              >
+                ⛶
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================================
+             SETTINGS PANEL
+        ================================================== -->
+
+        <div id="settingsPanel" class="player-popup settings-panel" hidden>
+          <div class="popup-header">
+            <span>Settings</span>
+
+            <button
+              id="closeSettings"
+              class="popup-close"
+              type="button"
+              aria-label="Close settings"
+            >
+              ×
+            </button>
+          </div>
+
+          <!-- Quality -->
+
+          <button id="qualityOption" class="settings-option" type="button">
+            <span>Quality</span>
+            <span id="qualityValue">Auto</span>
+          </button>
+
+          <!-- Playback Speed -->
+
+          <button
+            id="playbackSpeedOption"
+            class="settings-option"
+            type="button"
+          >
+            <span>Playback Speed</span>
+            <span id="speedValue">1×</span>
+          </button>
+
+          <!-- Video size -->
+
+          <button id="videoSizeOption" class="settings-option" type="button">
+            <span>Video Size</span>
+            <span id="videoSizeValue">Fit</span>
+          </button>
+
+          <!-- Download -->
+
+          <button id="downloadOption" class="settings-option" type="button">
+            <span>Download</span>
+            <span class="settings-option-icon">↓</span>
+          </button>
+        </div>
+
+        <div id="videoSizePanel" class="player-popup selection-panel" hidden>
+          <div class="popup-header">
+            <span>Video Size</span>
+            <button id="closeVideoSize" class="popup-close" type="button" aria-label="Close video size menu">×</button>
+          </div>
+          <div id="videoSizeTracks" class="selection-list">
+            <button class="selection-item active" type="button" data-video-size="fit"><span>Fit screen</span><span>✓</span></button>
+            <button class="selection-item" type="button" data-video-size="fill"><span>Fill screen</span><span></span></button>
+            <button class="selection-item" type="button" data-video-size="wide"><span>Wide 16:9</span><span></span></button>
+            <button class="selection-item" type="button" data-video-size="classic"><span>Classic 4:3</span><span></span></button>
+          </div>
+        </div>
+
+        <!-- =================================================
+             AUDIO PANEL
+        ================================================== -->
+        
+        <div id="qualityPanel" class="player-popup selection-panel" hidden>
+          <div class="popup-header">
+            <span>Quality</span>
+            <button
+              id="closeQuality"
+              class="popup-close"
+              type="button"
+              aria-label="Close quality menu"
+            >
+              ×
+            </button>
+          </div>
+          <div id="qualityTracks" class="selection-list">
+            <button class="selection-item active" type="button" data-quality="auto">
+              <span>Auto</span><span>✓</span>
+            </button>
+            <button class="selection-item" type="button" data-quality="4k">
+              <span>4K</span><span></span>
+            </button>
+            <button class="selection-item" type="button" data-quality="2k">
+              <span>2K</span><span></span>
+            </button>
+            <button class="selection-item" type="button" data-quality="1080p">
+              <span>1080p</span><span></span>
+            </button>
+            <button class="selection-item" type="button" data-quality="720p">
+              <span>720p</span><span></span>
+            </button>
+            <button class="selection-item" type="button" data-quality="480p">
+              <span>480p</span><span></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- =================================================
+             AUDIO PANEL
+        ================================================== -->
+
+        <div id="audioPanel" class="player-popup selection-panel" hidden>
+          <div class="popup-header">
+            <span>Audio</span>
+
+            <button
+              id="closeAudio"
+              class="popup-close"
+              type="button"
+              aria-label="Close audio menu"
+            >
+              ×
+            </button>
+          </div>
+
+          <div id="audioTracks" class="selection-list">
+            <button
+              class="selection-item active"
+              type="button"
+              data-audio-track="default"
+            >
+              <span>Original</span>
+              <span>✓</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- =================================================
+             SUBTITLE PANEL
+        ================================================== -->
+
+        <div id="subtitlePanel" class="player-popup selection-panel" hidden>
+          <div class="popup-header">
+            <span>Subtitles</span>
+
+            <button
+              id="closeSubtitles"
+              class="popup-close"
+              type="button"
+              aria-label="Close subtitles menu"
+            >
+              ×
+            </button>
+          </div>
+
+          <div id="subtitleTracks" class="selection-list">
+            <button
+              class="selection-item active"
+              type="button"
+              data-subtitle-track="off"
+            >
+              <span>Off</span>
+              <span>✓</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- =================================================
+             EPISODE NAVIGATION
+        ================================================== -->
+
+        <div id="episodeNavigation" class="episode-navigation" hidden>
+          <button
+            id="previousEpisode"
+            class="episode-nav-button previous"
+            type="button"
+          >
+            <span class="episode-nav-icon">←</span>
+
+            <span>
+              <strong>Previous</strong>
+              <small>Episode</small>
+            </span>
+          </button>
+
+          <div class="current-episode-info">
+            <span id="seriesTitle"> Web Series </span>
+
+            <strong id="episodeTitle"> Episode 1 </strong>
+
+            <small id="seasonTitle"> Season 1 </small>
+          </div>
+
+          <button
+            id="nextEpisode"
+            class="episode-nav-button next"
+            type="button"
+          >
+            <span>
+              <strong>Next</strong>
+              <small>Episode</small>
+            </span>
+
+            <span class="episode-nav-icon">→</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- =====================================================
+         VIDEO INFORMATION
+    ====================================================== -->
+
+      <section class="video-information">
+        <div class="video-heading">
+          <div>
+            <div id="videoType" class="video-type">MOVIE</div>
+
+            <h1 id="videoTitle" class="video-title">Loading...</h1>
+
+            <div id="videoMeta" class="video-meta">
+              <span id="videoYear">—</span>
+
+              <span>•</span>
+
+              <span id="videoRating">—</span>
+
+              <span>•</span>
+
+              <span id="videoQuality">HD</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================================
+             SERIES INFORMATION
+        ================================================== -->
+
+        <div id="seriesInformation" class="series-information" hidden>
+          <div class="episode-heading">
+            <span id="seriesTitleInfo"> Series </span>
+
+            <span class="episode-separator"> • </span>
+
+            <span id="seasonTitleInfo"> Season 1 </span>
+
+            <span class="episode-separator"> • </span>
+
+            <span id="episodeTitleInfo"> Episode 1 </span>
+          </div>
+
+          <div class="episode-navigation">
+            <button
+              id="previousEpisodeInfo"
+              class="episode-button"
+              type="button"
+            >
+              ← Previous
+            </button>
+
+            <button id="nextEpisodeInfo" class="episode-button" type="button">
+              Next →
+            </button>
+          </div>
+        </div>
+
+        <!-- Description -->
+
+        <p id="videoDescription" class="video-description"></p>
+
+        <!-- Resume -->
+
+        <div id="resumeInformation" class="resume-information" hidden>
+          <span> Resume position saved </span>
+        </div>
+      </section>
+    </main>
+
+    <!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
+    <script src="player.js"></script>
+  </body>
+</html>

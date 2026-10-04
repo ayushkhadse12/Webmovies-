@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>WebMovies — Web Series</title>
+
+    <link rel="stylesheet" href="series.css" />
+  </head>
+
+  <body>
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <header class="series-header">
+      <a href="index.html" class="logo"> <span>WEB</span>MOVIES </a>
+
+      <a href="index.html" class="back-button"> ← Home </a>
+    </header>
+
+    <!-- =================================================
+         SERIES HERO
+    ================================================== -->
+
+    <main>
+      <section class="series-hero">
+        <div class="series-hero-image" id="seriesHeroImage">
+          <img id="seriesPoster" src="" alt="" />
+          <video id="seriesHeroVideo" autoplay muted loop playsinline preload="metadata"></video>
+          <button id="seriesSoundButton" type="button" class="series-sound-button" aria-label="Mute or unmute">🔇</button>
+        </div>
+
+        <div class="series-hero-content">
+          <div id="seriesType" class="series-type">WEB SERIES</div>
+
+          <h1 id="seriesTitle">Breaking Bad</h1>
+
+          <div id="seriesMeta" class="series-meta">
+            <span>★ 9.5</span>
+            <span>2008</span>
+            <span>5 Seasons</span>
+          </div>
+
+          <p id="seriesDescription" class="series-description">
+            A chemistry teacher enters the dangerous world of manufacturing.
+          </p>
+        </div>
+      </section>
+
+      <!-- =================================================
+             COMING SOON SEASON
+        ================================================== -->
+
+      <section id="seriesComingSoonSection" style="display: none; padding: 2rem 5%; text-align: center;">
+        <div id="csSeasonContainer" style="position: relative; margin: 0 auto; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: max-width 0.3s ease;">
+          <img id="csSeasonPoster" src="" alt="Coming Soon" style="width: 100%; height: auto; display: block;" />
+          <video id="csSeasonVideo" autoplay muted loop playsinline preload="auto" style="width: 100%; height: auto; display: none;"></video>
+          
+          <div id="csSeasonPosterInfo" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 20px 20px; text-align: left; display: none; pointer-events: none;">
+            <div style="color: #ff1744; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px;">COMING SOON</div>
+            <h3 id="csSeasonPosterTitle" style="margin: 0 0 10px 0; font-size: 1.5rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);"></h3>
+            <p id="csSeasonPosterDesc" style="margin: 0; color: rgba(255,255,255,0.9); font-size: 0.95rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);"></p>
+          </div>
+
+          <button id="csSeasonSoundButton" aria-label="Mute or unmute" style="position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 10;">🔇</button>
+        </div>
+        
+        <div id="csSeasonVideoInfo" style="margin-top: 1.5rem; text-align: center; display: none;">
+          <h2 style="margin-bottom: 0.5rem; color: #ff1744; font-size: 1.3rem;">Coming Soon: <span id="csSeasonTitle"></span></h2>
+          <p id="csSeasonDescription" style="color: rgba(255,255,255,0.8); max-width: 800px; margin: 0 auto; line-height: 1.5; font-size: 1rem;"></p>
+        </div>
+      </section>
+
+      <!-- =================================================
+             SEASON SELECTOR
+        ================================================== -->
+
+      <section class="seasons-section">
+        <div class="section-heading">
+          <h2>Seasons</h2>
+
+          <select id="seasonSelect" class="season-select"></select>
+        </div>
+
+        <!-- =================================================
+                 EPISODES
+            ================================================== -->
+
+        <div id="episodesGrid" class="episodes-grid"></div>
+      </section>
+    </main>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal" style="display: none;">
+      <div class="modal">
+        <h2 id="authModalTitle">Login</h2>
+        <div id="authError" style="color: red; margin-bottom: 1rem; display: none;"></div>
+        <div class="form-group" id="authNameGroup" style="display: none;">
+          <label>Display Name</label>
+          <input type="text" id="authName" class="form-input" placeholder="Your name" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="authEmail" class="form-input" placeholder="user@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" class="form-input" placeholder="••••••••" />
+        </div>
+        <div class="modal-actions" style="margin-top: 2rem;">
+          <button class="button button-outline" id="authCancel">Cancel</button>
+          <button class="button button-primary" id="authSubmit">Login</button>
+        </div>
+        <div style="margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+          <a href="#" id="authToggleMode" style="color: var(--primary);">Need an account? Sign up</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="db.js"></script>
+    <script src="client-auth.js"></script>
+    <script src="app.js"></script>
+    <script src="series.js"></script>
+  </body>
+</html>

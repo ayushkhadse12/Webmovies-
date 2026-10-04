@@ -1,0 +1,15 @@
+{
+  "name": "webmovies-app",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "bcryptjs": "^2.4.3",
+    "fluent-ffmpeg": "^2.1.3",
+    "jsonwebtoken": "^9.0.0",
+    "uuid": "^9.0.0"
+  }
+}

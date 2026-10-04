@@ -1,0 +1,1291 @@
+/* =========================================================
+   WEBMOVIES PLAYER
+   COMPLETE PLAYER CSS
+========================================================= */
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    min-height: 100%;
+    background: #050505;
+    color-scheme: dark;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            circle at top,
+            #171717 0%,
+            #090909 42%,
+            #030303 100%
+        );
+    color: #ffffff;
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+    overflow-x: hidden;
+}
+
+
+/* =========================================================
+   PLAYER PAGE
+========================================================= */
+
+.player-page {
+    width: 100%;
+    min-height: 100vh;
+    background: #050505;
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.player-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    z-index: 100;
+
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 28px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.95),
+            rgba(0, 0, 0, 0.55),
+            transparent
+        );
+
+    pointer-events: none;
+}
+
+.player-topbar > * {
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.player-brand {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+
+    user-select: none;
+}
+
+.brand-web {
+    color: #ffffff;
+}
+
+.brand-movies {
+    color: #ff1744;
+}
+
+
+/* =========================================================
+   TOP BUTTONS
+========================================================= */
+
+.player-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-icon-button {
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(20, 20, 20, 0.72);
+    color: #ffffff;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+.player-icon-button:hover {
+    background: #ff1744;
+    color: #ffffff;
+    transform: scale(1.06);
+}
+
+
+/* =========================================================
+   VIDEO CONTAINER
+========================================================= */
+
+.video-container {
+    position: relative;
+
+    width: min(1500px, 100%);
+    aspect-ratio: 16 / 9;
+
+    margin: 0 auto;
+
+    background: #000000;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.55);
+}
+
+
+/* =========================================================
+   VIDEO
+========================================================= */
+
+.video-player {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: contain;
+
+    background: #000000;
+
+    z-index: 2;
+}
+
+.video-container.video-size-fit .video-player {
+    object-fit: contain;
+}
+
+.video-container.video-size-fill .video-player {
+    object-fit: cover;
+}
+
+.video-container.video-size-wide {
+    aspect-ratio: 16 / 9;
+}
+
+.video-container.video-size-wide .video-player {
+    object-fit: contain;
+}
+
+.video-container.video-size-classic {
+    aspect-ratio: 4 / 3;
+}
+
+.video-container.video-size-classic .video-player {
+    object-fit: contain;
+}
+
+
+/* =========================================================
+   POSTER
+========================================================= */
+
+.video-poster {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    z-index: 3;
+
+    background: #080808;
+
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease;
+}
+
+.video-container.video-started .video-poster {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   VIDEO LOADER
+========================================================= */
+
+.video-loader {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 7;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.15);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+.video-loader.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loader-spinner {
+    width: 52px;
+    height: 52px;
+
+    border-radius: 50%;
+
+    border: 4px solid rgba(255, 255, 255, 0.18);
+    border-top-color: #ff1744;
+
+    animation:
+        playerSpin 0.8s linear infinite;
+}
+
+@keyframes playerSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   CENTER PLAY BUTTON
+========================================================= */
+
+.center-play-button {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 8;
+
+    width: 78px;
+    height: 78px;
+
+    border: none;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding-left: 5px;
+
+    background: #ff1744;
+    color: #ffffff;
+
+    font-size: 30px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.5),
+        0 0 25px rgba(255, 23, 68, 0.22);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        opacity 0.25s ease;
+}
+
+.center-play-button:hover {
+    transform:
+        translate(-50%, -50%)
+        scale(1.08);
+
+    background: #ff1744;
+}
+
+.video-container.video-started .center-play-button {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   VIDEO CONTROLS
+========================================================= */
+
+.video-controls {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 10;
+
+    padding:
+        70px 22px 18px;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.94),
+            rgba(0, 0, 0, 0.55),
+            transparent
+        );
+
+    opacity: 1;
+
+    transition:
+        opacity 0.25s ease;
+}
+
+.video-container.controls-hidden .video-controls {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   PROGRESS AREA
+========================================================= */
+
+.progress-area {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   RANGE INPUT
+========================================================= */
+
+.progress-bar {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 100%;
+    height: 5px;
+
+    border-radius: 10px;
+
+    background: linear-gradient(
+        to right,
+        #ff1744 0%,
+        #ff1744 var(--progress, 0%),
+        #4a4a4a var(--progress, 0%),
+        #4a4a4a 100%
+    );
+
+    cursor: pointer;
+
+    outline: none;
+}
+
+.progress-bar::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+
+    background: #ff1744;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 0 0 3px rgba(255, 23, 68, 0.15);
+}
+
+.progress-bar::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #ff1744;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   CONTROLS ROW
+========================================================= */
+
+.controls-row {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+.controls-left,
+.controls-right {
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+/* =========================================================
+   CONTROL BUTTON
+========================================================= */
+
+.control-button {
+    min-width: 40px;
+    height: 40px;
+
+    padding: 0 8px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: transparent;
+    color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.control-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ff1744;
+}
+
+.control-button:active {
+    transform: scale(0.94);
+}
+
+
+/* =========================================================
+   TIME
+========================================================= */
+
+.time-display {
+    min-width: 110px;
+
+    color: #eeeeee;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    user-select: none;
+}
+
+
+/* =========================================================
+   POPUP PANELS
+========================================================= */
+
+.player-popup {
+    position: absolute;
+
+    right: 20px;
+    bottom: 78px;
+
+    z-index: 20;
+
+    width: 270px;
+
+    padding: 14px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 14px;
+
+    background:
+        rgba(18, 18, 18, 0.97);
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.55);
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    animation:
+        popupIn 0.18s ease;
+}
+
+@keyframes popupIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   POPUP HEADER
+========================================================= */
+
+.popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding:
+        4px 4px 12px;
+
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.07);
+}
+
+.popup-close {
+    width: 30px;
+    height: 30px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: transparent;
+    color: #aaaaaa;
+
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+.popup-close:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ff1744;
+}
+
+
+/* =========================================================
+   SETTINGS OPTIONS
+========================================================= */
+
+.settings-option {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 6px;
+    padding: 12px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: transparent;
+    color: #ffffff;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    transition:
+        background 0.2s ease;
+}
+
+.settings-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.settings-option span:last-child {
+    color: #aaaaaa;
+}
+
+
+/* =========================================================
+   SELECTION LIST
+========================================================= */
+
+.selection-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    margin-top: 8px;
+}
+
+.selection-item {
+    width: 100%;
+
+    min-height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px 12px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+    color: #eeeeee;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.selection-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.selection-item.active {
+    background: rgba(255, 23, 68, 0.12);
+    color: #ff1744;
+}
+
+
+/* =========================================================
+   VIDEO INFORMATION
+========================================================= */
+
+.video-information {
+    width: min(1500px, 100%);
+
+    margin: 0 auto;
+
+    padding:
+        28px 30px 70px;
+}
+
+
+/* =========================================================
+   TYPE
+========================================================= */
+
+.video-type {
+    margin-bottom: 7px;
+
+    color: #ff1744;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.video-title {
+    color: #ffffff;
+
+    font-size: clamp(24px, 3vw, 42px);
+    font-weight: 800;
+
+    line-height: 1.1;
+
+    margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   META
+========================================================= */
+
+.video-meta {
+    display: flex;
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    color: #aaaaaa;
+
+    font-size: 14px;
+}
+
+.video-meta span:nth-child(4) {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   SERIES INFORMATION
+========================================================= */
+
+.series-information {
+    margin-top: 20px;
+
+    padding: 15px 17px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255, 255, 255, 0.045);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.07);
+}
+
+.episode-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 8px;
+
+    color: #eeeeee;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.episode-separator {
+    color: #ff1744;
+}
+
+
+/* =========================================================
+   EPISODE NAVIGATION
+========================================================= */
+
+.episode-navigation {
+    display: flex;
+    gap: 10px;
+
+    margin-top: 14px;
+}
+
+.episode-button {
+    padding: 9px 15px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.1);
+
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.episode-button:hover {
+    background: #ff1744;
+    border-color: #ff1744;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.video-description {
+    max-width: 850px;
+
+    margin-top: 20px;
+
+    color: #aaaaaa;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   RESUME
+========================================================= */
+
+.resume-information {
+    display: inline-flex;
+    align-items: center;
+
+    margin-top: 18px;
+    padding: 7px 11px;
+
+    border-radius: 7px;
+
+    background:
+        rgba(255, 23, 68, 0.1);
+
+    color: #ff1744;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   HIDDEN
+========================================================= */
+
+[hidden] {
+    display: none !important;
+}
+
+
+/* =========================================================
+   SELECTION
+========================================================= */
+
+::selection {
+    background: #ff1744;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ff1744;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .player-topbar {
+        height: 62px;
+        padding: 0 18px;
+    }
+
+    .player-brand {
+        font-size: 19px;
+    }
+
+    .player-icon-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .video-controls {
+        padding:
+            60px 16px 13px;
+    }
+
+    .video-information {
+        padding:
+            22px 20px 50px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    body {
+        background: #000000;
+    }
+
+    .player-topbar {
+        height: 54px;
+
+        padding: 0 12px;
+    }
+
+    .player-brand {
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+
+    .player-icon-button {
+        width: 36px;
+        height: 36px;
+
+        font-size: 18px;
+    }
+
+    .video-container {
+        width: 100%;
+
+        aspect-ratio: 16 / 9;
+
+        margin-top: 0;
+
+        box-shadow: none;
+    }
+
+    .center-play-button {
+        width: 58px;
+        height: 58px;
+
+        font-size: 23px;
+    }
+
+    .video-controls {
+        padding:
+            45px 10px 8px;
+    }
+
+    .controls-row {
+        gap: 4px;
+    }
+
+    .controls-left,
+    .controls-right {
+        gap: 1px;
+    }
+
+    .control-button {
+        min-width: 34px;
+        height: 34px;
+
+        padding: 0 4px;
+
+        font-size: 13px;
+    }
+
+    .time-display {
+        min-width: auto;
+
+        font-size: 10px;
+    }
+
+    /*
+       Keep the less important buttons
+       compact on small screens.
+    */
+
+    #rewindButton,
+    #forwardButton {
+        font-size: 11px;
+    }
+
+    .player-popup {
+        left: 10px;
+        right: 10px;
+        bottom: 65px;
+
+        width: auto;
+
+        max-height: 65vh;
+
+        overflow-y: auto;
+    }
+
+    .video-information {
+        padding:
+            20px 15px 45px;
+    }
+
+    .video-title {
+        font-size: 25px;
+    }
+
+    .video-meta {
+        font-size: 12px;
+    }
+
+    .video-description {
+        font-size: 13px;
+
+        line-height: 1.65;
+    }
+
+    .episode-heading {
+        font-size: 13px;
+    }
+
+    .episode-navigation {
+        width: 100%;
+    }
+
+    .episode-button {
+        flex: 1;
+
+        padding: 10px 8px;
+
+        font-size: 12px;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .player-brand {
+        font-size: 14px;
+    }
+
+    #audioButton,
+    #subtitleButton {
+        display: none;
+    }
+
+    .control-button {
+        min-width: 31px;
+
+        font-size: 12px;
+    }
+
+    .time-display {
+        font-size: 9px;
+    }
+
+}
+
+/* =====================================================
+   EPISODE NAVIGATION
+===================================================== */
+
+.episode-navigation {
+    width: 100%;
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 20px;
+
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+}
+
+.episode-nav-button {
+    min-height: 58px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+
+    padding: 10px 18px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.episode-nav-button:hover {
+    background: rgba(255, 23, 68, 0.16);
+    border-color: #ff1744;
+    transform: translateY(-2px);
+}
+
+.episode-nav-button.next {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.episode-nav-button.previous {
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.episode-nav-button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.episode-nav-icon {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ff1744;
+    color: #ffffff;
+
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.episode-nav-button strong {
+    display: block;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.episode-nav-button small {
+    display: block;
+
+    margin-top: 2px;
+
+    color: rgba(255, 255, 255, 0.55);
+
+    font-size: 12px;
+}
+
+.current-episode-info {
+    min-width: 180px;
+
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.current-episode-info span {
+    color: #ff1744;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.current-episode-info strong {
+    color: #ffffff;
+
+    font-size: 16px;
+}
+
+.current-episode-info small {
+    color: rgba(255, 255, 255, 0.55);
+
+    font-size: 12px;
+}
+
+@media (max-width: 700px) {
+
+    .episode-navigation {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 0 12px;
+    }
+
+    .current-episode-info {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        order: -1;
+    }
+
+    .episode-nav-button {
+        min-height: 52px;
+        padding: 8px 12px;
+    }
+
+    .episode-nav-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
+
+}

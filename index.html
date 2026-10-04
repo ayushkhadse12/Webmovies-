@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="WebMovies - Your personal movies, web series and songs library."
+    />
+
+    <title>WebMovies</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <header class="site-header">
+      <div class="header-left">
+        <a href="index.html" class="logo" id="logo">
+          <span>web</span><strong>movies</strong>
+        </a>
+
+        <nav class="main-nav">
+          <button class="nav-link active" data-section="home">
+            <span>⌂</span>
+            <span>Home</span>
+          </button>
+
+          <button class="nav-link" data-section="movies">
+            <span>▣</span>
+            <span>Movies</span>
+          </button>
+
+          <button class="nav-link" data-section="series">
+            <span>▤</span>
+            <span>Web Series</span>
+          </button>
+
+          <button class="nav-link" data-section="songs">
+            <span>♫</span>
+            <span>Songs</span>
+          </button>
+
+          <button class="nav-link" data-section="downloads">
+            <span>📥</span>
+            <span>Downloaded</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="header-right">
+        <a class="admin-link" href="admin.html">Admin</a>
+
+        <button class="search-button" id="searchButton" aria-label="Search">
+          <span>⌕</span>
+          <span>Search</span>
+        </button>
+
+        <button class="profile-button" id="profileButton">
+          <div class="profile-avatar small" id="headerAvatar">W</div>
+
+          <span class="profile-name-header" id="headerProfileName"> User </span>
+
+          <span class="profile-arrow">⌄</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- =========================
+         SEARCH PANEL
+    ========================== -->
+
+    <div class="search-panel" id="searchPanel">
+      <div class="search-panel-inner">
+        <div class="search-input-wrapper">
+          <span class="search-icon">⌕</span>
+
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search movies, web series, songs..."
+            autocomplete="off"
+          />
+
+          <button id="closeSearch" class="close-search">×</button>
+        </div>
+
+        <div class="search-results" id="searchResults">
+          <p class="search-message">Start typing to search your library.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================
+         PROFILE PANEL
+    ========================== -->
+
+    <div class="modal-overlay" id="profileOverlay">
+      <div class="profile-modal" id="profileModal">
+        <button class="modal-close" id="closeProfile">×</button>
+
+        <div class="profile-modal-header">
+          <div
+            class="profile-avatar large editable-avatar"
+            id="profileAvatar"
+            title="Double-click to change profile picture"
+          >
+            W
+          </div>
+
+          <div>
+            <p class="profile-label">YOUR PROFILE</p>
+
+            <h2 id="profileHeading">User</h2>
+
+            <p class="profile-hint">
+              Double-click your picture or name to edit.
+            </p>
+          </div>
+        </div>
+
+        <div class="profile-editor">
+          <label> Profile name </label>
+
+          <div
+            class="editable-name"
+            id="editableName"
+            title="Double-click to edit"
+          >
+            User
+          </div>
+
+          <input type="file" id="profileImageInput" accept="image/*" hidden />
+
+          <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button class="profile-save" id="saveProfile" style="flex: 1;">Save Profile</button>
+            <button class="profile-save" id="logoutProfileBtn" style="flex: 1; background: var(--red);">Log Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main id="mainContent">
+      <!-- =========================
+             HOME
+        ========================== -->
+
+      <section id="homeSection" class="page-section active-section">
+
+        <!-- HERO -->
+
+        <section class="hero-section">
+          <div class="hero-slider" id="heroSlider">
+            <button
+              class="hero-arrow hero-arrow-left"
+              id="heroPrevious"
+              aria-label="Previous"
+            >
+              ‹
+            </button>
+
+            <div class="hero-media" id="heroMedia">
+              <div class="hero-track" id="heroTrack"></div>
+
+              <!-- Play button -->
+              <button class="hero-play-button" id="heroPlayButton">
+                <span>▶</span>
+                <span>Play Now</span>
+              </button>
+
+              <!-- Sound -->
+              <button
+                class="hero-sound-button"
+                id="heroSoundButton"
+                aria-label="Mute or unmute preview"
+              >
+                🔇
+              </button>
+
+              <!-- Slider dots -->
+              <div class="hero-dots" id="heroDots"></div>
+            </div>
+
+            <button
+              class="hero-arrow hero-arrow-right"
+              id="heroNext"
+              aria-label="Next"
+            >
+              ›
+            </button>
+          </div>
+        </section>
+
+        <!-- COMING SOON (hidden when empty) -->
+
+        <section class="content-section coming-soon-section" id="comingSoonSection" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">UPCOMING</p>
+              <h2>Coming Soon</h2>
+            </div>
+          </div>
+          <div class="cs-slider-wrap">
+            <button class="cs-arrow cs-arrow-left" id="csPrev" aria-label="Previous">‹</button>
+            <div class="cs-track-outer">
+              <div class="cs-track" id="csTrack"></div>
+            </div>
+            <button class="cs-arrow cs-arrow-right" id="csNext" aria-label="Next">›</button>
+          </div>
+        </section>
+
+        <!-- CONTINUE WATCHING -->
+
+        <section class="content-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">PICK UP WHERE YOU LEFT OFF</p>
+
+              <h2>Continue Watching</h2>
+            </div>
+
+            <button class="see-all" data-section="movies" type="button">See All</button>
+          </div>
+
+          <div class="card-row continue-watching-row" id="continueWatchingRow"></div>
+        </section>
+
+        <!-- POPULAR MOVIES -->
+
+        <section class="content-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">MOVIES</p>
+
+              <h2>Popular Movies</h2>
+            </div>
+
+            <button class="see-all" data-section="movies" type="button">See All</button>
+          </div>
+
+          <div class="card-row" id="moviesRow"></div>
+        </section>
+
+        <!-- WEB SERIES -->
+
+        <section class="content-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">SERIES</p>
+
+              <h2>Trending Web Series</h2>
+            </div>
+
+            <button class="see-all" data-section="series" type="button">See All</button>
+          </div>
+
+          <div class="card-row" id="seriesRow"></div>
+        </section>
+
+        <!-- SONGS -->
+
+        <section class="content-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">MUSIC</p>
+
+              <h2>Popular Songs</h2>
+            </div>
+
+            <button class="see-all" data-section="songs" type="button">See All</button>
+          </div>
+
+          <div class="card-row song-row" id="songsRow"></div>
+        </section>
+      </section>
+
+      <!-- =========================
+             MOVIES PAGE
+        ========================== -->
+
+      <section id="moviesSection" class="page-section">
+        <div class="page-title">
+          <p class="section-kicker">MOVIES</p>
+
+          <h1>Movies</h1>
+        </div>
+
+        <div class="library-grid" id="moviesLibrary"></div>
+      </section>
+
+      <!-- =========================
+             WEB SERIES PAGE
+        ========================== -->
+
+      <section id="seriesSection" class="page-section">
+        <div class="page-title">
+          <p class="section-kicker">SERIES</p>
+
+          <h1>Web Series</h1>
+
+          <p>Series → Seasons → Episodes</p>
+        </div>
+
+        <div class="library-grid" id="seriesLibrary"></div>
+      </section>
+
+      <!-- =========================
+             SONGS PAGE
+        ========================== -->
+
+      <section id="songsSection" class="page-section">
+        <div class="page-title">
+          <p class="section-kicker">MUSIC</p>
+
+          <h1>Songs</h1>
+        </div>
+
+        <div class="song-library" id="songsLibrary"></div>
+      </section>
+
+      <!-- =========================
+             DOWNLOADS PAGE
+        ========================== -->
+
+      <section id="downloadsSection" class="page-section">
+        <div class="page-title">
+          <p class="section-kicker">OFFLINE</p>
+
+          <h1>Downloaded</h1>
+          <p>Movies and series available offline</p>
+        </div>
+
+        <div class="library-grid" id="downloadsLibrary"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-logo">web<strong>movies</strong></div>
+
+      <p>Your personal entertainment library.</p>
+    </footer>
+
+    <!-- =========================
+         AUTH MODAL
+    ========================== -->
+    <div class="modal-overlay" id="authModal" style="display: none;">
+      <div class="modal">
+        <h2 id="authModalTitle">Login</h2>
+        <div id="authError" style="color: red; margin-bottom: 1rem; display: none;"></div>
+        <div class="form-group" id="authNameGroup" style="display: none;">
+          <label>Display Name</label>
+          <input type="text" id="authName" class="form-input" placeholder="Your name" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="authEmail" class="form-input" placeholder="user@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" class="form-input" placeholder="••••••••" />
+        </div>
+        <div class="modal-actions" style="margin-top: 2rem;">
+          <button class="button button-outline" id="authCancel">Cancel</button>
+          <button class="button button-primary" id="authSubmit">Login</button>
+        </div>
+        <div style="margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+          <a href="#" id="authToggleMode" style="color: var(--primary);">Need an account? Sign up</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="db.js"></script>
+    <script src="client-auth.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
