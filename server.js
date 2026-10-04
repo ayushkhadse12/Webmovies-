@@ -153,8 +153,9 @@ function parseRawBody(req) {
 }
 
 function requireAdmin(req, res) {
-  const token = req.headers["x-admin-token"] || "";
-  if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
+  const token = (req.headers["x-admin-token"] || "").trim();
+  const validToken = (ADMIN_TOKEN || "admin").trim();
+  if (token !== validToken) {
     sendJson(res, 403, { error: "Forbidden" });
     return false;
   }
