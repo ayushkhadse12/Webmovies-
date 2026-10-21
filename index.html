@@ -78,7 +78,43 @@
           <span class="profile-arrow">⌄</span>
         </button>
       </div>
+
+    <!-- MOBILE HAMBURGER (visible only on mobile) -->
+    <button class="mobile-hamburger-btn" id="mobileHamburgerBtn" aria-label="Open menu">
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+    </button>
     </header>
+
+    <!-- MOBILE SIDEBAR DRAWER -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <aside class="mobile-sidebar" id="mobileSidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-brand">web<strong>movies</strong></span>
+        <button class="sidebar-close" id="closeSidebarBtn">×</button>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-link active" data-section="home">⌂ Home</button>
+        <button class="sidebar-link" data-section="movies">▣ Movies</button>
+        <button class="sidebar-link" data-section="series">▤ Web Series</button>
+        <button class="sidebar-link" data-section="songs">♫ Songs</button>
+        <button class="sidebar-link" data-section="downloads">📥 Downloads</button>
+      </nav>
+      <div class="sidebar-footer">
+        <a class="sidebar-app-btn" href="/api/app/download/android" download="WebMovies.apk" style="margin-bottom: 8px; background: var(--red); color: #fff;">📱 Download Android App</a>
+        <a class="sidebar-app-btn" href="admin.html">⚙ Admin Panel</a>
+      </div>
+    </aside>
+
+    <!-- MOBILE QUICK TOP NAV (pills bar below header, mobile only) -->
+    <div class="mobile-quick-top-nav" id="mobileQuickNav">
+      <button class="quick-nav-pill active" data-section="home">Home</button>
+      <button class="quick-nav-pill" data-section="movies">Movies</button>
+      <button class="quick-nav-pill" data-section="series">Web Series</button>
+      <button class="quick-nav-pill" data-section="songs">Songs</button>
+      <button class="quick-nav-pill" data-section="downloads">Downloads</button>
+    </div>
 
     <!-- =========================
          SEARCH PANEL

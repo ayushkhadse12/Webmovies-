@@ -2575,6 +2575,30 @@ HERO ARROWS
 }
 .media-card-title { font-weight: 600; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .media-card-subtitle { font-size: .85rem; color: var(--text-soft); }
+/* Card hover video preview */
+.card-hover-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.card-hover-video.playing {
+  opacity: 1;
+}
+
+/* Enhanced card hover effect */
+.media-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.media-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(255,23,68,0.25), 0 4px 12px rgba(0,0,0,0.4);
+}
 /* End of added CSS */
 
 /* Dynamic Coming Soon 16:9 Aspect Ratio */
@@ -2583,3 +2607,201 @@ HERO ARROWS
   aspect-ratio: 16 / 9;
 }
 
+
+
+/* =========================================================
+   MOBILE-ONLY UI (hamburger, sidebar, quick-nav)
+   PC layout is NEVER changed.
+========================================================= */
+
+/* Hide mobile elements on desktop */
+@media (min-width: 901px) {
+  .mobile-hamburger-btn,
+  .sidebar-backdrop,
+  .mobile-sidebar,
+  .mobile-quick-top-nav { display: none !important; }
+}
+
+/* Mobile styles */
+@media (max-width: 900px) {
+  /* Hide desktop nav on mobile */
+  .main-nav { display: none !important; }
+  .admin-link { display: none !important; }
+  .profile-name-header { display: none !important; }
+  .profile-arrow { display: none !important; }
+
+  /* Hamburger button */
+  .mobile-hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    margin-right: 8px;
+    order: -1;
+    z-index: 100;
+  }
+  .ham-line {
+    display: block;
+    width: 24px;
+    height: 2.5px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+
+  /* Header layout on mobile */
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Sidebar backdrop */
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .sidebar-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Sidebar drawer */
+  .mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 270px;
+    height: 100vh;
+    background: var(--panel);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    border-right: 1px solid var(--border);
+  }
+  .mobile-sidebar.open {
+    left: 0;
+  }
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-brand {
+    font-size: 1.3rem;
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+  }
+  .sidebar-brand strong { color: var(--red); }
+  .sidebar-close {
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    font-size: 1.6rem;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 0;
+    overflow-y: auto;
+  }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 22px;
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s, color 0.2s;
+  }
+  .sidebar-link:hover,
+  .sidebar-link.active {
+    background: rgba(255,23,68,0.1);
+    color: var(--red);
+  }
+  .sidebar-footer {
+    padding: 16px 18px;
+    border-top: 1px solid var(--border);
+  }
+  .sidebar-app-btn {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    background: rgba(255,23,68,0.15);
+    color: var(--red);
+    border-radius: var(--radius-small);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  /* Quick top nav pills */
+  .mobile-quick-top-nav {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: var(--header-height);
+    z-index: 90;
+  }
+  .mobile-quick-top-nav::-webkit-scrollbar { display: none; }
+  .quick-nav-pill {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    border-radius: 20px;
+    background: var(--panel-light);
+    color: var(--text-soft);
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .quick-nav-pill.active {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+  }
+
+  /* Hover video on cards — mobile: show on tap */
+  .card-hover-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .media-card-image:hover .card-hover-video.playing,
+  .card-hover-video.playing {
+    opacity: 1;
+  }
+}

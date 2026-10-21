@@ -332,7 +332,11 @@ function startHeroPreview() {
     const activeVideo = activeSlide.querySelector(".hero-video");
     if (!activeVideo) return;
 
-    activeVideo.currentTime = 0;
+    try {
+        if (activeVideo.readyState > 0) {
+            activeVideo.currentTime = 0;
+        }
+    } catch (_) {}
     activeVideo.muted = heroMuted;
 
     if (heroSoundButton) {
@@ -499,6 +503,8 @@ function createMediaCard(item) {
                 loading="lazy"
             >
 
+            ${(item.video || item.audio) ? `<video class="card-hover-video" src="${item.video || item.audio}" muted loop playsinline preload="metadata"></video>` : ''}
+
             <div class="card-overlay">
 
                 ${showDownloadButton ? `
@@ -588,6 +594,37 @@ function createMediaCard(item) {
         }
     );
 
+
+    // Hover video preview
+    const hoverVideo = card.querySelector('.card-hover-video');
+    if (hoverVideo) {
+        let hoverTimeout = null;
+        
+        card.addEventListener('mouseenter', () => {
+            hoverTimeout = setTimeout(() => {
+                hoverVideo.muted = true;
+                const playPromise = hoverVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            hoverVideo.classList.add('playing');
+                        })
+                        .catch(() => {});
+                }
+            }, 150);
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            clearTimeout(hoverTimeout);
+            hoverVideo.classList.remove('playing');
+            hoverVideo.pause();
+            try {
+                if (hoverVideo.readyState > 0) {
+                    hoverVideo.currentTime = 0;
+                }
+            } catch (_) {}
+        });
+    }
 
     return card;
 
@@ -1042,6 +1079,15 @@ function switchSection(sectionName) {
             "active",
             nav.dataset.section === sectionName
         );
+    });
+
+    // Sync mobile quick nav pills
+    document.querySelectorAll('.quick-nav-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.section === sectionName);
+    });
+    // Sync sidebar links
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.classList.toggle('active', link.dataset.section === sectionName);
     });
 
     window.scrollTo({
@@ -1648,6 +1694,14 @@ function toClientItem(item) {
     // Series are always "downloadable" (episodes have their own streams)
     const isDownloadable = item.kind === "series" || Boolean(mediaUrl);
 
+    let videoUrl = item.kind === "song" ? "" : (mediaUrl || item.video || item.clip || item.trailer || "");
+    if (!videoUrl && item.media && item.media.streamUrl) {
+        videoUrl = item.media.streamUrl;
+    }
+    if (!videoUrl && item.seasons && item.seasons[0] && item.seasons[0].episodes && item.seasons[0].episodes[0] && item.seasons[0].episodes[0].media) {
+        videoUrl = item.seasons[0].episodes[0].media.streamUrl || "";
+    }
+
     return {
         ...item,
         type:
@@ -1656,8 +1710,8 @@ function toClientItem(item) {
                 : item.kind === "song"
                     ? "Song"
                     : "Movie",
-        video: item.kind === "song" ? "" : mediaUrl,
-        audio: item.kind === "song" ? mediaUrl : "",
+        video: videoUrl,
+        audio: item.kind === "song" ? (mediaUrl || item.audio || "") : "",
         download: isDownloadable ? (mediaUrl || "series") : ""
     };
 
@@ -2038,6 +2092,52 @@ function initializeWebMovies() {
     
     // Auth
     initAuthUI();
+
+    /* MOBILE SIDEBAR */
+    const hamburgerBtn = document.getElementById('mobileHamburgerBtn');
+    const sidebar = document.getElementById('mobileSidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+    function openMobileSidebar() {
+        if (sidebar) sidebar.classList.add('open');
+        if (sidebarBackdrop) sidebarBackdrop.classList.add('active');
+    }
+    function closeMobileSidebar() {
+        if (sidebar) sidebar.classList.remove('open');
+        if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
+    }
+
+    if (hamburgerBtn) hamburgerBtn.addEventListener('click', openMobileSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeMobileSidebar);
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+    // Sidebar nav links
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', () => {
+            const section = link.dataset.section;
+            switchSection(section);
+            closeMobileSidebar();
+            // Sync active state
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        });
+    });
+
+    // Quick top nav pills
+    document.querySelectorAll('.quick-nav-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+            const section = pill.dataset.section;
+            switchSection(section);
+            // Sync active state
+            document.querySelectorAll('.quick-nav-pill').forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            // Also sync sidebar links
+            document.querySelectorAll('.sidebar-link').forEach(l => {
+                l.classList.toggle('active', l.dataset.section === section);
+            });
+        });
+    });
 }
 
 /* =========================================================

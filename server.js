@@ -198,6 +198,15 @@ async function handleRequest(req, res) {
     return sendJson(res, 200, catalog);
   }
 
+  // --- GET /api/app/download/android ---
+  if ((pathname === "/api/app/download/android" || pathname === "/app/WebMovies.apk") && method === "GET") {
+    const apkPath = path.join(__dirname, "app", "WebMovies.apk");
+    if (fs.existsSync(apkPath)) {
+      res.setHeader("Content-Disposition", 'attachment; filename="WebMovies.apk"');
+      return serveStaticFile(res, apkPath, req);
+    }
+  }
+
   // --- POST /api/admin/verify ---
   if (pathname === "/api/admin/verify" && method === "POST") {
     if (!requireAdmin(req, res)) return;
@@ -298,6 +307,7 @@ async function handleRequest(req, res) {
         if (body.title !== undefined) list[idx].title = body.title;
         if (body.description !== undefined) list[idx].description = body.description;
         if (body.poster !== undefined) list[idx].poster = body.poster;
+        if (body.position !== undefined) list[idx].position = Number(body.position);
         if (body.video !== undefined) {
           list[idx].video = body.video;
           // Also update media if it's a catalog item

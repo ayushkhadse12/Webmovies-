@@ -295,8 +295,8 @@
   "settings": {
     "csCardSize": "large",
     "seasonCsCardSize": "xlarge",
-    "movieCardSize": "medium",
+    "movieCardSize": "xlarge",
     "seriesCardSize": "medium",
-    "songCardSize": "medium"
+    "songCardSize": "large"
   }
 }

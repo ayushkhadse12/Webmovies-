@@ -383,7 +383,8 @@ async function reorderItem(id, direction, type) {
     if (!token) return alert("Not authenticated.");
 
     try {
-        const res = await fetch("/api/admin/reorder", {
+        const endpoint = type === "hero" ? "/api/admin/hero-slide/reorder" : "/api/admin/reorder";
+        const res = await fetch(endpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -747,6 +748,16 @@ function openEditModal(item) {
         videoInput.value = "";
     }
 
+    const posLabel = document.getElementById("editPositionLabel");
+    const posInput = document.getElementById("editPosition");
+    if (item.position !== undefined) {
+        if (posLabel) posLabel.style.display = "block";
+        if (posInput) posInput.value = item.position;
+    } else {
+        if (posLabel) posLabel.style.display = "none";
+        if (posInput) posInput.value = "";
+    }
+
     editModal.style.display = "flex";
 }
 
@@ -762,6 +773,7 @@ document.getElementById("editForm")?.addEventListener("submit", async (e) => {
     const id = document.getElementById("editItemId").value;
     const btn = document.getElementById("editSubmitBtn");
     const message = document.getElementById("editFormMessage");
+    const posInput = document.getElementById("editPosition");
 
     const payload = {
         id,
@@ -770,6 +782,10 @@ document.getElementById("editForm")?.addEventListener("submit", async (e) => {
         poster: document.getElementById("editPoster").value.trim(),
         video: document.getElementById("editVideo").value.trim()
     };
+
+    if (posInput && posInput.value !== "") {
+        payload.position = Number(posInput.value);
+    }
 
     try {
         btn.disabled = true;
