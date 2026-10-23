@@ -105,49 +105,8 @@ const songs = [
    HERO SLIDES
 ========================================================= */
 
-const defaultDemoHeroSlides = [
-    {
-        id: "hero-demo-inception",
-        title: "Inception",
-        type: "Movie",
-        year: "2010",
-        rating: "8.8",
-        quality: "4K",
-        description: "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
-        poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&q=80",
-        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        playback: "",
-        isComingSoon: false
-    },
-    {
-        id: "hero-demo-dark-knight",
-        title: "The Dark Knight",
-        type: "Movie",
-        year: "2008",
-        rating: "9.0",
-        quality: "HD",
-        description: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests.",
-        poster: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1280&q=80",
-        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        playback: "",
-        isComingSoon: false
-    },
-    {
-        id: "hero-demo-avengers",
-        title: "Avengers: Endgame",
-        type: "Movie",
-        year: "2019",
-        rating: "8.4",
-        quality: "4K",
-        description: "After the devastating events of Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more.",
-        poster: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1280&q=80",
-        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-        playback: "",
-        isComingSoon: false
-    }
-];
-
-const heroSlides = [...defaultDemoHeroSlides];
+const defaultDemoHeroSlides = [];
+const heroSlides = [];
 
 
 /* =========================================================
@@ -451,12 +410,14 @@ heroPlayButton.addEventListener(
         const item =
             heroSlides[currentHeroIndex];
 
-        // Series → open the series page instead of the player
-        if (item.type === "Web Series" && item.mediaId) {
-            window.location.href = `series.html?id=${encodeURIComponent(item.mediaId)}`;
+        // Web Series → open series page
+        if (item.type === "Web Series") {
+            const seriesId = item.mediaId || item.id;
+            window.location.href = `series.html?id=${encodeURIComponent(seriesId)}`;
             return;
         }
 
+        // Movie → open player
         const playbackUrl =
             item.playback ||
             (item.playbackAvailable && item.id
@@ -1929,13 +1890,16 @@ async function loadServerCatalog() {
                 : "";
 
             return {
-                id: linkedItem?.id || item.id,
+                id: item.id,
+                mediaId: linkedItem ? linkedItem.id : (item.mediaId || ""),
                 title: item.title,
-                type: item.type || "Featured",
-                year: item.year || "",
-                rating: item.rating || "",
+                type: linkedItem
+                    ? (linkedItem.kind === "series" ? "Web Series" : "Movie")
+                    : (item.type || "Movie"),
+                year: item.year || (linkedItem?.year) || "",
+                rating: item.rating || (linkedItem?.rating) || "",
                 quality: item.quality || "HD",
-                description: item.description,
+                description: item.description || (linkedItem?.description) || "",
                 poster: item.poster,
                 video: item.video || "",
                 playback,
@@ -1944,14 +1908,8 @@ async function loadServerCatalog() {
             };
         });
 
-        // Regular catalog slides
-        const regularSlides = (movies.length || series.length)
-            ? [...movies, ...series].slice(0, 5).map(item => ({ ...item, quality: 'HD', isComingSoon: false }))
-            : defaultDemoHeroSlides;
-
-        const finalSlides = customHeroSlides.length
-            ? [...customHeroSlides, ...regularSlides]
-            : regularSlides;
+        // Only show admin-added hero slides. No auto-random catalog slides.
+        const finalSlides = customHeroSlides.length ? customHeroSlides : [];
 
         if (finalSlides.length) {
             replaceItems(heroSlides, finalSlides);

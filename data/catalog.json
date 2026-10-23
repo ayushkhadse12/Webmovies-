@@ -254,49 +254,13 @@
       "type": "Movie",
       "quality": "HD",
       "position": 1
-    },
-    {
-      "id": "hero-demo-inception",
-      "title": "Inception",
-      "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
-      "poster": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&q=80",
-      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-      "year": "2010",
-      "rating": "8.8",
-      "type": "Movie",
-      "quality": "4K",
-      "position": 2
-    },
-    {
-      "id": "hero-demo-dark-knight",
-      "title": "The Dark Knight",
-      "description": "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests.",
-      "poster": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1280&q=80",
-      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-      "year": "2008",
-      "rating": "9.0",
-      "type": "Movie",
-      "quality": "HD",
-      "position": 3
-    },
-    {
-      "id": "hero-demo-avengers",
-      "title": "Avengers: Endgame",
-      "description": "After the devastating events of Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more.",
-      "poster": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1280&q=80",
-      "video": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-      "year": "2019",
-      "rating": "8.4",
-      "type": "Movie",
-      "quality": "4K",
-      "position": 4
     }
   ],
   "settings": {
-    "csCardSize": "large",
+    "csCardSize": "medium",
     "seasonCsCardSize": "xlarge",
-    "movieCardSize": "xlarge",
-    "seriesCardSize": "medium",
+    "movieCardSize": "large",
+    "seriesCardSize": "large",
     "songCardSize": "large"
   }
 }
