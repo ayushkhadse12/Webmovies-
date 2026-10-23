@@ -206,11 +206,32 @@
             </div>
 
             <div id="seriesMediaFields" hidden>
-              <label>
-                Episode media map <span>(optional during first import)</span>
-                <textarea id="episodeMedia" rows="7" spellcheck="false" placeholder='{"1-1":{"provider":"terabox","path":"/WebMovies/Series/Title/S01E01.mp4"}}'></textarea>
+
+              <label style="margin-bottom:12px;">
+                Episode video source
+                <select id="seriesMediaProvider">
+                  <option value="none">Add episodes later (no video now)</option>
+                  <option value="direct">Direct URL (Google Drive / Archive.org / any .mp4 link)</option>
+                  <option value="episodemap">Advanced: Episode map (JSON)</option>
+                </select>
               </label>
-              <p class="field-help">The series information and posters are automatic. You can attach TeraBox episode paths now or add them later.</p>
+
+              <div id="seriesDirectUrlFields" hidden style="margin-top:12px;">
+                <label>
+                  Season 1 Episode 1 — Direct video URL
+                  <input id="seriesDirectUrl" type="url" placeholder="https://drive.google.com/uc?export=download&id=..." />
+                </label>
+                <p class="field-help" style="margin-top:6px;">Paste a direct .mp4 link for the first episode. You can add more episodes later from Manage Catalog.</p>
+              </div>
+
+              <div id="seriesEpisodeMapFields" hidden style="margin-top:12px;">
+                <label>
+                  Episode media map <span>(optional during first import)</span>
+                  <textarea id="episodeMedia" rows="7" spellcheck="false" placeholder='{"1-1":{"provider":"direct","streamUrl":"https://...mp4"}}'></textarea>
+                </label>
+                <p class="field-help">Format: <code>{"Season-Episode": {"provider":"direct","streamUrl":"URL"}}</code>. e.g. "1-1" = Season 1, Episode 1.</p>
+              </div>
+
             </div>
 
             <button id="importButton" class="import-button" type="submit">Fetch details and add to catalog</button>

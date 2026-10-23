@@ -433,7 +433,25 @@ function updateMediaFields() {
     directUrlField.hidden = !usesDirectUrl;
     localFileField.hidden = !usesLocalFile;
     localFileHelp.hidden = !usesLocalFile;
+
+    // Series sub-provider fields
+    if (isSeries) {
+        const seriesProvider = document.getElementById("seriesMediaProvider");
+        if (seriesProvider) {
+            const v = seriesProvider.value;
+            const directFields = document.getElementById("seriesDirectUrlFields");
+            const mapFields = document.getElementById("seriesEpisodeMapFields");
+            if (directFields) directFields.hidden = (v !== "direct");
+            if (mapFields) mapFields.hidden = (v !== "episodemap");
+        }
+    }
 }
+
+// Wire the series provider dropdown
+document.addEventListener("DOMContentLoaded", function() {
+    var sp = document.getElementById("seriesMediaProvider");
+    if (sp) sp.addEventListener("change", updateMediaFields);
+});
 
 function getMovieMedia() {
     if (mediaProvider.value === "terabox") {
@@ -483,13 +501,27 @@ async function uploadLocalMovie() {
 }
 
 function getEpisodeMedia() {
-    const input = document.getElementById("episodeMedia").value.trim();
-    if (!input) return {};
-    try {
-        return JSON.parse(input);
-    } catch {
-        throw new Error("Episode media map must be valid JSON.");
+    const seriesProvider = document.getElementById("seriesMediaProvider");
+    const providerVal = seriesProvider ? seriesProvider.value : "none";
+
+    if (providerVal === "direct") {
+        const url = (document.getElementById("seriesDirectUrl") || {}).value || "";
+        if (!url.trim()) return {};
+        // Map S1E1 as "1-1"
+        return { "1-1": { provider: "direct", streamUrl: url.trim(), downloadUrl: url.trim() } };
     }
+
+    if (providerVal === "episodemap") {
+        const input = (document.getElementById("episodeMedia") || {}).value || "";
+        if (!input.trim()) return {};
+        try {
+            return JSON.parse(input.trim());
+        } catch {
+            throw new Error("Episode media map must be valid JSON.");
+        }
+    }
+
+    return {};
 }
 
 mediaKind.addEventListener("change", updateMediaFields);
