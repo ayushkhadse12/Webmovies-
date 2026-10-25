@@ -1686,30 +1686,13 @@ function replaceItems(target, nextItems) {
 
 function toClientItem(item) {
 
-    const mediaUrl =
-        item.playbackAvailable
-            ? `/api/media/${encodeURIComponent(item.id)}`
-            : "";
-
-    // Series are always "downloadable" (episodes have their own streams)
+    const directStreamUrl = (item.media && item.media.streamUrl) ? item.media.streamUrl : "";
+    const mediaUrl = directStreamUrl || (item.playbackAvailable ? `/api/media/${encodeURIComponent(item.id)}` : "");
     const isDownloadable = item.kind === "series" || Boolean(mediaUrl);
 
-    // For Drive-hosted movies, use the direct Drive URL so the player can detect
-    // and embed it via iframe (Drive blocks video via <video src> / api/media redirect)
-    const directStreamUrl = item.media && item.media.streamUrl ? item.media.streamUrl : "";
-    const isDriveHosted = directStreamUrl && directStreamUrl.includes("drive.google.com");
-
-    let videoUrl = item.kind === "song" ? "" : (mediaUrl || item.video || item.clip || item.trailer || "");
-    if (!videoUrl && directStreamUrl) {
-        videoUrl = directStreamUrl;
-    }
+    let videoUrl = item.kind === "song" ? "" : (directStreamUrl || item.video || item.clip || item.trailer || mediaUrl || "");
     if (!videoUrl && item.seasons && item.seasons[0] && item.seasons[0].episodes && item.seasons[0].episodes[0] && item.seasons[0].episodes[0].media) {
         videoUrl = item.seasons[0].episodes[0].media.streamUrl || "";
-    }
-
-    // Override: if the item is Drive-hosted, always use the direct Drive URL for the player
-    if (isDriveHosted && item.kind !== "song" && item.kind !== "series") {
-        videoUrl = directStreamUrl;
     }
 
     return {

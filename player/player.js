@@ -456,6 +456,7 @@ function getDriveEmbedUrl(url) {
 
 function getPartUrl(index) {
     if (!playerData.video) return "";
+    if (!isMultiPart) return playerData.video;
     return playerData.video.includes("?")
         ? `${playerData.video}&part=${index}`
         : `${playerData.video}?part=${index}`;
@@ -2156,7 +2157,7 @@ async function prepareMultiPartPlayback() {
 
     let videoUrl = playerData.video || "";
 
-    // If it is an /api/media/ URL, resolve actual media info from server first
+    // If it is an /api/media/ URL, resolve actual media info from server
     if (videoUrl.startsWith("/api/media/")) {
         try {
             const sep = videoUrl.includes("?") ? "&" : "?";

@@ -149,12 +149,20 @@
               "poster": "https://image.tmdb.org/t/p/w780/9hGF3WUkBf7cSjMg0cdMDHaQBAP.jpg",
               "media": {
                 "provider": "direct",
-                "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+                "streamUrl": "https://drive.google.com/uc?export=download&id=1UcYvHR1khPEirEMQyGAXdmUqjohQaGU3",
+                "downloadUrl": "https://drive.google.com/uc?export=download&id=1UcYvHR1khPEirEMQyGAXdmUqjohQaGU3"
               }
             }
           ]
         }
-      ]
+      ],
+      "episodeMedia": {
+        "1-1": {
+          "provider": "direct",
+          "streamUrl": "https://drive.google.com/uc?export=download&id=1UcYvHR1khPEirEMQyGAXdmUqjohQaGU3",
+          "downloadUrl": "https://drive.google.com/uc?export=download&id=1UcYvHR1khPEirEMQyGAXdmUqjohQaGU3"
+        }
+      }
     },
     {
       "id": "song-1",
