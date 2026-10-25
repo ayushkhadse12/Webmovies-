@@ -245,8 +245,102 @@ async function handleRequest(req, res) {
       showOnHome: true,
     };
 
-    if (isSeries && body.episodeMedia) {
-      item.episodeMedia = body.episodeMedia;
+    if (isSeries) {
+      item.episodeMedia = body.episodeMedia || {};
+      const seasons = [];
+      const tvId = body.tmdbId || tmdbData?.id;
+
+      if (tvId && TMDB_BEARER) {
+        try {
+          const tvDetails = await tmdbDetails(tvId, "series");
+          if (tvDetails && Array.isArray(tvDetails.seasons)) {
+            for (const s of tvDetails.seasons) {
+              if (!s.season_number) continue; // skip season 0 / specials
+              const sNum = s.season_number;
+              let sDetails = null;
+              try {
+                const sRes = await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${sNum}`, {
+                  headers: { Authorization: `Bearer ${TMDB_BEARER}`, accept: "application/json" },
+                });
+                sDetails = await sRes.json();
+              } catch {}
+
+              const episodes = ((sDetails && sDetails.episodes) || []).map(ep => {
+                const key = `${sNum}-${ep.episode_number}`;
+                const epMedia = (item.episodeMedia && item.episodeMedia[key]) || {};
+                return {
+                  id: `${slug}-s${sNum}-e${ep.episode_number}`,
+                  number: ep.episode_number,
+                  title: ep.name || `Episode ${ep.episode_number}`,
+                  description: ep.overview || "",
+                  duration: ep.runtime ? `${ep.runtime}m` : "",
+                  poster: tmdbImage(ep.still_path || s.poster_path || tvDetails.backdrop_path),
+                  media: epMedia
+                };
+              });
+
+              seasons.push({
+                number: sNum,
+                title: s.name || `Season ${sNum}`,
+                poster: tmdbImage(s.poster_path || tvDetails.poster_path),
+                episodes
+              });
+            }
+          }
+        } catch (err) {
+          console.warn("Failed to fetch full seasons from TMDB:", err.message);
+        }
+      }
+
+      // If no seasons were fetched from TMDB, construct them from episodeMedia keys
+      if (seasons.length === 0) {
+        const epMap = item.episodeMedia || {};
+        const seasonGroups = {};
+        for (const [key, mediaObj] of Object.entries(epMap)) {
+          const parts = key.split("-");
+          const sNum = parseInt(parts[0], 10) || 1;
+          const eNum = parseInt(parts[1], 10) || 1;
+          if (!seasonGroups[sNum]) seasonGroups[sNum] = [];
+          seasonGroups[sNum].push({
+            id: `${slug}-s${sNum}-e${eNum}`,
+            number: eNum,
+            title: `Episode ${eNum}`,
+            description: "",
+            duration: "",
+            poster: item.poster,
+            media: mediaObj
+          });
+        }
+
+        const sortedSNums = Object.keys(seasonGroups).map(Number).sort((a, b) => a - b);
+        if (sortedSNums.length > 0) {
+          for (const sNum of sortedSNums) {
+            seasons.push({
+              number: sNum,
+              title: `Season ${sNum}`,
+              poster: item.poster,
+              episodes: seasonGroups[sNum].sort((a, b) => a.number - b.number)
+            });
+          }
+        } else {
+          seasons.push({
+            number: 1,
+            title: "Season 1",
+            poster: item.poster,
+            episodes: [{
+              id: `${slug}-s1-e1`,
+              number: 1,
+              title: "Episode 1",
+              description: "",
+              duration: "",
+              poster: item.poster,
+              media: {}
+            }]
+          });
+        }
+      }
+
+      item.seasons = seasons;
     }
 
     // Avoid duplicates in items
@@ -314,6 +408,47 @@ async function handleRequest(req, res) {
           if (list[idx].media && body.video) {
             list[idx].media.streamUrl = body.video;
             list[idx].media.downloadUrl = body.video;
+          }
+        }
+        if (body.seasonNumber && body.episodeNumber && body.episodeUrl) {
+          const sNum = parseInt(body.seasonNumber, 10);
+          const eNum = parseInt(body.episodeNumber, 10);
+          const epUrl = String(body.episodeUrl).trim();
+          if (sNum && eNum && epUrl) {
+            if (!Array.isArray(list[idx].seasons)) list[idx].seasons = [];
+            let season = list[idx].seasons.find(s => s.number === sNum);
+            if (!season) {
+              season = {
+                number: sNum,
+                title: `Season ${sNum}`,
+                poster: list[idx].poster,
+                episodes: []
+              };
+              list[idx].seasons.push(season);
+              list[idx].seasons.sort((a, b) => a.number - b.number);
+            }
+            if (!Array.isArray(season.episodes)) season.episodes = [];
+            let episode = season.episodes.find(e => e.number === eNum);
+            if (!episode) {
+              episode = {
+                id: `${list[idx].id}-s${sNum}-e${eNum}`,
+                number: eNum,
+                title: `Episode ${eNum}`,
+                description: "",
+                duration: "",
+                poster: season.poster || list[idx].poster,
+                media: { provider: "direct", streamUrl: epUrl, downloadUrl: epUrl }
+              };
+              season.episodes.push(episode);
+              season.episodes.sort((a, b) => a.number - b.number);
+            } else {
+              if (!episode.media) episode.media = {};
+              episode.media.provider = "direct";
+              episode.media.streamUrl = epUrl;
+              episode.media.downloadUrl = epUrl;
+            }
+            if (!list[idx].episodeMedia) list[idx].episodeMedia = {};
+            list[idx].episodeMedia[`${sNum}-${eNum}`] = { provider: "direct", streamUrl: epUrl, downloadUrl: epUrl };
           }
         }
         found = true;

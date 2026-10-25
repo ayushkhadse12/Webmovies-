@@ -217,11 +217,22 @@
               </label>
 
               <div id="seriesDirectUrlFields" hidden style="margin-top:12px;">
-                <label>
-                  Season 1 Episode 1 — Direct video URL
-                  <input id="seriesDirectUrl" type="url" placeholder="https://drive.google.com/uc?export=download&id=..." />
-                </label>
-                <p class="field-help" style="margin-top:6px;">Paste a direct .mp4 link for the first episode. You can add more episodes later from Manage Catalog.</p>
+                <p class="field-help" style="margin-bottom:10px;">Specify Season number, Episode number, and paste your direct video link (Google Drive / Archive.org / direct MP4):</p>
+                <div id="seriesEpisodesList" style="display:flex; flex-direction:column; gap:12px;">
+                  <div class="series-ep-row" style="display:grid; grid-template-columns: 85px 85px 1fr auto; gap:8px; align-items:end;">
+                    <label style="margin:0;">Season
+                      <input type="number" class="ep-season-input" min="1" value="1" style="margin-top:4px;" />
+                    </label>
+                    <label style="margin:0;">Episode
+                      <input type="number" class="ep-number-input" min="1" value="1" style="margin-top:4px;" />
+                    </label>
+                    <label style="margin:0;">Direct Video URL
+                      <input type="url" class="ep-url-input" placeholder="https://drive.google.com/uc?export=download&id=..." style="margin-top:4px;" />
+                    </label>
+                    <button type="button" class="remove-ep-row-btn" style="background:rgba(255,23,68,0.2); color:#ff1744; border:1px solid #ff1744; border-radius:6px; height:42px; padding:0 12px; cursor:pointer;" title="Remove">✕</button>
+                  </div>
+                </div>
+                <button type="button" id="addEpRowBtn" class="button button-outline" style="margin-top:12px; width:auto; font-size:0.85rem; padding:6px 14px; cursor:pointer;">+ Add Another Episode / Season</button>
               </div>
 
               <div id="seriesEpisodeMapFields" hidden style="margin-top:12px;">
@@ -498,6 +509,21 @@
             <label id="editPositionLabel" style="display: none;">Hero Position (Order)
               <input type="number" id="editPosition" min="0" />
             </label>
+            <div id="editSeriesEpisodeSection" style="display: none; border-top: 1px solid var(--border); padding-top: 14px; margin-top: 14px;">
+              <h4 style="margin-bottom: 8px; color: var(--red);">Add or Update Episode Video:</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <label>Season Number
+                  <input type="number" id="editSeasonNumber" min="1" placeholder="e.g. 2" />
+                </label>
+                <label>Episode Number
+                  <input type="number" id="editEpisodeNumber" min="1" placeholder="e.g. 2" />
+                </label>
+              </div>
+              <label style="margin-top: 8px;">Episode Video Stream URL
+                <input type="url" id="editEpisodeUrl" placeholder="https://drive.google.com/uc?export=download&id=..." />
+              </label>
+              <p class="field-help" style="margin-top: 4px;">Enter Season & Episode number (e.g. Season 2, Episode 2) and paste the video stream link.</p>
+            </div>
             <button type="submit" id="editSubmitBtn" class="import-button">Save Changes</button>
             <p id="editFormMessage" class="form-message" aria-live="polite"></p>
           </form>

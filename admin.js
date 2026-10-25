@@ -505,10 +505,21 @@ function getEpisodeMedia() {
     const providerVal = seriesProvider ? seriesProvider.value : "none";
 
     if (providerVal === "direct") {
-        const url = (document.getElementById("seriesDirectUrl") || {}).value || "";
-        if (!url.trim()) return {};
-        // Map S1E1 as "1-1"
-        return { "1-1": { provider: "direct", streamUrl: url.trim(), downloadUrl: url.trim() } };
+        const result = {};
+        const rows = document.querySelectorAll(".series-ep-row");
+        rows.forEach(row => {
+            const sInput = row.querySelector(".ep-season-input");
+            const eInput = row.querySelector(".ep-number-input");
+            const uInput = row.querySelector(".ep-url-input");
+            const s = sInput ? sInput.value.trim() : "1";
+            const e = eInput ? eInput.value.trim() : "1";
+            const url = uInput ? uInput.value.trim() : "";
+            if (url) {
+                const key = `${s || 1}-${e || 1}`;
+                result[key] = { provider: "direct", streamUrl: url, downloadUrl: url };
+            }
+        });
+        return result;
     }
 
     if (providerVal === "episodemap") {
@@ -523,6 +534,58 @@ function getEpisodeMedia() {
 
     return {};
 }
+
+// Add/Remove episode rows dynamically in import form
+document.addEventListener("DOMContentLoaded", () => {
+    const addBtn = document.getElementById("addEpRowBtn");
+    const list = document.getElementById("seriesEpisodesList");
+
+    if (addBtn && list) {
+        addBtn.addEventListener("click", () => {
+            const rows = list.querySelectorAll(".series-ep-row");
+            let nextSeason = 1;
+            let nextEp = rows.length + 1;
+            if (rows.length > 0) {
+                const lastRow = rows[rows.length - 1];
+                const lastSeasonInput = lastRow.querySelector(".ep-season-input");
+                const lastEpInput = lastRow.querySelector(".ep-number-input");
+                if (lastSeasonInput) nextSeason = parseInt(lastSeasonInput.value, 10) || 1;
+                if (lastEpInput) nextEp = (parseInt(lastEpInput.value, 10) || 1) + 1;
+            }
+
+            const rowDiv = document.createElement("div");
+            rowDiv.className = "series-ep-row";
+            rowDiv.style = "display:grid; grid-template-columns: 85px 85px 1fr auto; gap:8px; align-items:end;";
+            rowDiv.innerHTML = `
+                <label style="margin:0;">Season
+                  <input type="number" class="ep-season-input" min="1" value="${nextSeason}" style="margin-top:4px;" />
+                </label>
+                <label style="margin:0;">Episode
+                  <input type="number" class="ep-number-input" min="1" value="${nextEp}" style="margin-top:4px;" />
+                </label>
+                <label style="margin:0;">Direct Video URL
+                  <input type="url" class="ep-url-input" placeholder="https://drive.google.com/uc?export=download&id=..." style="margin-top:4px;" />
+                </label>
+                <button type="button" class="remove-ep-row-btn" style="background:rgba(255,23,68,0.2); color:#ff1744; border:1px solid #ff1744; border-radius:6px; height:42px; padding:0 12px; cursor:pointer;" title="Remove">✕</button>
+            `;
+            list.appendChild(rowDiv);
+        });
+
+        list.addEventListener("click", (e) => {
+            if (e.target.classList.contains("remove-ep-row-btn")) {
+                const rows = list.querySelectorAll(".series-ep-row");
+                if (rows.length > 1) {
+                    e.target.closest(".series-ep-row").remove();
+                } else {
+                    const row = rows[0];
+                    row.querySelector(".ep-season-input").value = "1";
+                    row.querySelector(".ep-number-input").value = "1";
+                    row.querySelector(".ep-url-input").value = "";
+                }
+            }
+        });
+    }
+});
 
 mediaKind.addEventListener("change", updateMediaFields);
 mediaProvider.addEventListener("change", updateMediaFields);
@@ -790,6 +853,21 @@ function openEditModal(item) {
         if (posInput) posInput.value = "";
     }
 
+    const seriesSection = document.getElementById("editSeriesEpisodeSection");
+    if (seriesSection) {
+        if (item.kind === "series") {
+            seriesSection.style.display = "block";
+            const sNumInput = document.getElementById("editSeasonNumber");
+            const eNumInput = document.getElementById("editEpisodeNumber");
+            const epUrlInput = document.getElementById("editEpisodeUrl");
+            if (sNumInput) sNumInput.value = "1";
+            if (eNumInput) eNumInput.value = "1";
+            if (epUrlInput) epUrlInput.value = "";
+        } else {
+            seriesSection.style.display = "none";
+        }
+    }
+
     editModal.style.display = "flex";
 }
 
@@ -814,6 +892,15 @@ document.getElementById("editForm")?.addEventListener("submit", async (e) => {
         poster: document.getElementById("editPoster").value.trim(),
         video: document.getElementById("editVideo").value.trim()
     };
+
+    const sNum = document.getElementById("editSeasonNumber")?.value.trim();
+    const eNum = document.getElementById("editEpisodeNumber")?.value.trim();
+    const epUrl = document.getElementById("editEpisodeUrl")?.value.trim();
+    if (sNum && eNum && epUrl) {
+        payload.seasonNumber = sNum;
+        payload.episodeNumber = eNum;
+        payload.episodeUrl = epUrl;
+    }
 
     if (posInput && posInput.value !== "") {
         payload.position = Number(posInput.value);

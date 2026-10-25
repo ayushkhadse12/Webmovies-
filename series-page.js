@@ -146,7 +146,7 @@
                 ...ep,
                 playbackUrl: ep.playbackAvailable
                     ? `/api/media/${encodeURIComponent(ep.id)}`
-                    : (ep.media && ep.media.streamUrl ? ep.media.streamUrl : "")
+                    : (ep.media && (ep.media.streamUrl || ep.media.url || ep.media.downloadUrl) ? (ep.media.streamUrl || ep.media.url || ep.media.downloadUrl) : "")
             }))
         }));
 
