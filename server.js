@@ -689,12 +689,31 @@ async function handleRequest(req, res) {
   if (pathname.startsWith("/api/media/") && method === "GET") {
     const mediaId = decodeURIComponent(pathname.slice("/api/media/".length));
     const catalog = await readCatalog();
-    const item = catalog.items.find((i) => i.id === mediaId);
-    if (!item || !item.media) return sendJson(res, 404, { error: "Media not found." });
+    let mediaObj = null;
+    const item = (catalog.items || []).find((i) => i.id === mediaId);
+    if (item && item.media) {
+      mediaObj = item.media;
+    } else {
+      for (const it of (catalog.items || [])) {
+        for (const s of (it.seasons || [])) {
+          const ep = (s.episodes || []).find(e => e.id === mediaId);
+          if (ep && ep.media) {
+            mediaObj = ep.media;
+            break;
+          }
+        }
+        if (mediaObj) break;
+      }
+    }
+    if (!mediaObj) return sendJson(res, 404, { error: "Media not found." });
+
+    if (req.url.includes("info=1")) {
+      return sendJson(res, 200, { ok: true, media: mediaObj });
+    }
 
     // Handle local files specially based on provider/filename
-    if (item.media.provider === "local" && item.media.filename) {
-        let filePath = path.join(UPLOADS_DIR, item.media.filename);
+    if (mediaObj.provider === "local" && mediaObj.filename) {
+        let filePath = path.join(UPLOADS_DIR, mediaObj.filename);
         
         // Auto-serve MP4 version if MKV was requested (for browser seeking support)
         if (filePath.endsWith(".mkv")) {
@@ -707,7 +726,7 @@ async function handleRequest(req, res) {
         return serveStaticFile(res, filePath, req);
     }
 
-    const url = item.media.streamUrl || "";
+    const url = mediaObj.streamUrl || "";
     if (!url) return sendJson(res, 404, { error: "No stream URL." });
 
     // Legacy fallback for local files that stored absolute path in streamUrl

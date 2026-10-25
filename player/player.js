@@ -428,15 +428,20 @@ let isDriveEmbed = false;
 
 function getDriveFileId(url) {
     if (!url) return null;
-    const ucMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    const str = String(url).trim().replace(/['"]/g, "");
+    const ucMatch = str.match(/[?&]id=([a-zA-Z0-9_-]+)/);
     if (ucMatch) return ucMatch[1];
-    const fdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    const fdMatch = str.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if (fdMatch) return fdMatch[1];
+    if (!str.includes("://") && !str.includes("/") && !str.includes(" ") && /^[a-zA-Z0-9_-]{20,}$/.test(str)) {
+        return str;
+    }
     return null;
 }
 
 function isDriveUrl(url) {
-    return !!(url && url.includes("drive.google.com"));
+    if (!url) return false;
+    return !!(url.includes("drive.google.com") || getDriveFileId(url));
 }
 
 function getDriveEmbedUrl(url) {
@@ -2149,16 +2154,40 @@ async function prepareMultiPartPlayback() {
     activePlayer = videoPlayer;
     inactivePlayer = secondaryVideoPlayer;
 
+    let videoUrl = playerData.video || "";
+
+    // If it is an /api/media/ URL, resolve actual media info from server first
+    if (videoUrl.startsWith("/api/media/")) {
+        try {
+            const sep = videoUrl.includes("?") ? "&" : "?";
+            const infoRes = await fetch(`${videoUrl}${sep}info=1`);
+            if (infoRes.ok) {
+                const infoJson = await infoRes.json();
+                if (infoJson.media && infoJson.media.streamUrl) {
+                    videoUrl = infoJson.media.streamUrl;
+                    playerData.video = videoUrl;
+                }
+            }
+        } catch (e) {
+            console.warn("Could not resolve media info:", e);
+        }
+    }
+
     // --- Google Drive detection: use iframe embed instead of <video> ---
-    const videoUrl = playerData.video || "";
     if (isDriveUrl(videoUrl) && driveEmbedFrame) {
         const embedUrl = getDriveEmbedUrl(videoUrl);
         if (embedUrl) {
             isDriveEmbed = true;
             videoPlayer.style.display = "none";
             secondaryVideoPlayer.style.display = "none";
+
+            // Hide poster and native controls, bring Drive player to front
+            if (videoContainer) videoContainer.classList.add("video-started");
+            if (videoPoster) videoPoster.style.display = "none";
+
             driveEmbedFrame.src = embedUrl;
-            driveEmbedFrame.style.cssText = "display:block; border:none; background:#000; position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;";
+            driveEmbedFrame.style.cssText = "display:block; border:none; background:#000; position:absolute; top:0; left:0; width:100%; height:100%; z-index:10;";
+
             const vc = document.getElementById("videoControls");
             if (vc) vc.style.display = "none";
             const vl = document.getElementById("videoLoader");

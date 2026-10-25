@@ -142,12 +142,18 @@
         /* ── map episode media to playback URLs ─────────── */
         const seasons = (raw.seasons || []).map(season => ({
             ...season,
-            episodes: (season.episodes || []).map(ep => ({
-                ...ep,
-                playbackUrl: ep.playbackAvailable
-                    ? `/api/media/${encodeURIComponent(ep.id)}`
-                    : (ep.media && (ep.media.streamUrl || ep.media.url || ep.media.downloadUrl) ? (ep.media.streamUrl || ep.media.url || ep.media.downloadUrl) : "")
-            }))
+            episodes: (season.episodes || []).map(ep => {
+                const directUrl = (ep.media && (ep.media.streamUrl || ep.media.url || ep.media.downloadUrl)) || "";
+                const isDrive = directUrl.includes("drive.google.com") || /^[a-zA-Z0-9_-]{20,}$/.test(directUrl.trim());
+                return {
+                    ...ep,
+                    playbackUrl: (isDrive && directUrl)
+                        ? directUrl
+                        : (ep.playbackAvailable
+                            ? `/api/media/${encodeURIComponent(ep.id)}`
+                            : directUrl)
+                };
+            })
         }));
 
         /* Expose for openEpisodePlayer */

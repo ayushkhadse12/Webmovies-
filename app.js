@@ -442,7 +442,12 @@ function handleHeroAction(item) {
 
     const targetItem = matchedMovie || item;
     const mediaId = targetItem.mediaId || targetItem.id;
+    const driveUrl = (targetItem.media && targetItem.media.streamUrl && targetItem.media.streamUrl.includes("drive.google.com"))
+        ? targetItem.media.streamUrl
+        : (item.video && item.video.includes("drive.google.com") ? item.video : "");
+
     const playbackUrl =
+        driveUrl ||
         item.playback ||
         targetItem.playback ||
         (targetItem.playbackAvailable && mediaId
@@ -1689,12 +1694,22 @@ function toClientItem(item) {
     // Series are always "downloadable" (episodes have their own streams)
     const isDownloadable = item.kind === "series" || Boolean(mediaUrl);
 
+    // For Drive-hosted movies, use the direct Drive URL so the player can detect
+    // and embed it via iframe (Drive blocks video via <video src> / api/media redirect)
+    const directStreamUrl = item.media && item.media.streamUrl ? item.media.streamUrl : "";
+    const isDriveHosted = directStreamUrl && directStreamUrl.includes("drive.google.com");
+
     let videoUrl = item.kind === "song" ? "" : (mediaUrl || item.video || item.clip || item.trailer || "");
-    if (!videoUrl && item.media && item.media.streamUrl) {
-        videoUrl = item.media.streamUrl;
+    if (!videoUrl && directStreamUrl) {
+        videoUrl = directStreamUrl;
     }
     if (!videoUrl && item.seasons && item.seasons[0] && item.seasons[0].episodes && item.seasons[0].episodes[0] && item.seasons[0].episodes[0].media) {
         videoUrl = item.seasons[0].episodes[0].media.streamUrl || "";
+    }
+
+    // Override: if the item is Drive-hosted, always use the direct Drive URL for the player
+    if (isDriveHosted && item.kind !== "song" && item.kind !== "series") {
+        videoUrl = directStreamUrl;
     }
 
     return {
@@ -2014,6 +2029,13 @@ function openPlayer(title, video = "", item = null) {
     const playerUrl =
         new URL("player/player.html", window.location.href);
 
+    let finalVideo = video || "";
+    if (item && item.media && item.media.streamUrl && (item.media.streamUrl.includes("drive.google.com") || /^[a-zA-Z0-9_-]{20,}$/.test(item.media.streamUrl.trim()))) {
+        finalVideo = item.media.streamUrl;
+    } else if (item && item.video && (item.video.includes("drive.google.com") || /^[a-zA-Z0-9_-]{20,}$/.test(item.video.trim()))) {
+        finalVideo = item.video;
+    }
+
     const playerData = {
         id: item?.id || title || "webmovies-video",
         title: title || "WebMovies",
@@ -2022,8 +2044,8 @@ function openPlayer(title, video = "", item = null) {
         rating: item?.rating || "",
         description: item?.description || "",
         poster: item?.poster || "",
-        video: video || "",
-        download: item?.download || video || "",
+        video: finalVideo,
+        download: item?.download || finalVideo || "",
         parts: item?.parts || 1
     };
 
