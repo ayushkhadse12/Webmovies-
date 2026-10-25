@@ -194,8 +194,8 @@
               </label>
 
               <label id="directUrlField" hidden style="margin-top:18px;">
-                Direct MP4 or audio URL
-                <input id="directUrl" type="url" placeholder="https://media.example.com/example.mp4" />
+                Direct MP4 / Stream URL or Google Drive File ID
+                <input id="directUrl" type="text" placeholder="Paste Google Drive File ID or stream URL (e.g. 1ajx... or https://...)" />
               </label>
 
               <label id="localFileField" hidden style="margin-top:18px;">
@@ -217,7 +217,7 @@
               </label>
 
               <div id="seriesDirectUrlFields" hidden style="margin-top:12px;">
-                <p class="field-help" style="margin-bottom:10px;">Specify Season number, Episode number, and paste your direct video link (Google Drive / Archive.org / direct MP4):</p>
+                <p class="field-help" style="margin-bottom:10px;">Specify Season number, Episode number, and paste your Google Drive ID or direct stream link:</p>
                 <div id="seriesEpisodesList" style="display:flex; flex-direction:column; gap:12px;">
                   <div class="series-ep-row" style="display:grid; grid-template-columns: 85px 85px 1fr auto; gap:8px; align-items:end;">
                     <label style="margin:0;">Season
@@ -226,8 +226,8 @@
                     <label style="margin:0;">Episode
                       <input type="number" class="ep-number-input" min="1" value="1" style="margin-top:4px;" />
                     </label>
-                    <label style="margin:0;">Direct Video URL
-                      <input type="url" class="ep-url-input" placeholder="https://drive.google.com/uc?export=download&id=..." style="margin-top:4px;" />
+                    <label style="margin:0;">Direct Video URL or Drive ID
+                      <input type="text" class="ep-url-input" placeholder="Paste Drive ID (e.g. 1ajx...) or direct URL" style="margin-top:4px;" />
                     </label>
                     <button type="button" class="remove-ep-row-btn" style="background:rgba(255,23,68,0.2); color:#ff1744; border:1px solid #ff1744; border-radius:6px; height:42px; padding:0 12px; cursor:pointer;" title="Remove">✕</button>
                   </div>
@@ -308,8 +308,8 @@
             </label>
 
             <label>
-              Direct Video URL <span>(optional — plays on hover as preview)</span>
-              <input id="csVideo" type="url" placeholder="https://example.com/trailer.mp4" />
+              Direct Video URL <span>(optional — Google Drive ID or MP4 clip plays on hover)</span>
+              <input id="csVideo" type="text" placeholder="Paste Google Drive ID or trailer URL" />
             </label>
 
             <button id="csSubmitButton" class="import-button" type="submit">Add to Coming Soon</button>
@@ -376,8 +376,8 @@
             </label>
 
             <label>
-              Hover Preview Video URL <span>(optional MP4 clip — plays on hover)</span>
-              <input id="heroVideoInput" type="url" placeholder="https://example.com/preview.mp4" />
+              Hover Preview Video URL <span>(optional — Google Drive ID or MP4 clip plays on hover)</span>
+              <input id="heroVideoInput" type="text" placeholder="Paste Google Drive ID or preview URL" />
             </label>
 
             <label>
@@ -520,8 +520,8 @@
             <label>Poster URL
               <input type="url" id="editPoster" />
             </label>
-            <label id="editVideoLabel">Hover Video / Direct Stream URL
-              <input type="text" id="editVideo" />
+            <label id="editVideoLabel">Hover Video / Direct Stream URL (or Google Drive ID)
+              <input type="text" id="editVideo" placeholder="Paste Google Drive ID or stream URL" />
             </label>
             <label id="editPositionLabel" style="display: none;">Hero Position (Order)
               <input type="number" id="editPosition" min="0" />
@@ -536,8 +536,8 @@
                   <input type="number" id="editEpisodeNumber" min="1" placeholder="e.g. 2" />
                 </label>
               </div>
-              <label style="margin-top: 8px;">Episode Video Stream URL
-                <input type="url" id="editEpisodeUrl" placeholder="https://drive.google.com/uc?export=download&id=..." />
+              <label style="margin-top: 8px;">Episode Video Stream URL (or Google Drive ID)
+                <input type="text" id="editEpisodeUrl" placeholder="Paste Google Drive ID or stream URL" />
               </label>
               <p class="field-help" style="margin-top: 4px;">Enter Season & Episode number (e.g. Season 2, Episode 2) and paste the video stream link.</p>
             </div>

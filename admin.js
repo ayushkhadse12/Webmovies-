@@ -405,6 +405,47 @@ async function reorderItem(id, direction, type) {
 }
 
 /* â”€â”€â”€ IMPORT FORM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function formatStreamUrl(input) {
+    if (!input) return "";
+    const str = String(input).trim().replace(/['"]/g, "");
+    if (!str) return "";
+    if (str.includes("drive.google.com")) {
+        const fileD = str.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (fileD) return `https://drive.google.com/uc?export=download&id=${fileD[1]}`;
+        const idParam = str.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if (idParam) return `https://drive.google.com/uc?export=download&id=${idParam[1]}`;
+    }
+    if (!str.includes("://") && !str.includes("/") && !str.includes(" ") && /^[a-zA-Z0-9_-]{20,}$/.test(str)) {
+        return `https://drive.google.com/uc?export=download&id=${str}`;
+    }
+    return str;
+}
+
+// Live auto-format for any Drive ID or link pasted into video URL inputs
+function handleDriveAutoFormat(e) {
+    const t = e.target;
+    if (!t) return;
+    const isVideoField = (
+        t.id === "directUrl" ||
+        t.id === "heroVideoInput" ||
+        t.id === "csVideo" ||
+        t.id === "editVideo" ||
+        t.id === "editEpisodeUrl" ||
+        (t.classList && t.classList.contains("ep-url-input"))
+    );
+    if (!isVideoField) return;
+
+    const val = t.value;
+    const formatted = formatStreamUrl(val);
+    if (formatted !== val) {
+        t.value = formatted;
+    }
+}
+
+document.addEventListener("input", handleDriveAutoFormat);
+document.addEventListener("blur", handleDriveAutoFormat, true);
+document.addEventListener("change", handleDriveAutoFormat);
+
 const importForm = document.getElementById("importForm");
 const importButton = document.getElementById("importButton");
 const formMessage = document.getElementById("formMessage");
@@ -459,7 +500,7 @@ function getMovieMedia() {
         const path = document.getElementById("teraBoxPath").value.trim();
         return path ? { provider: "terabox", path } : {};
     }
-    const streamUrl = document.getElementById("directUrl").value.trim();
+    const streamUrl = formatStreamUrl(document.getElementById("directUrl").value.trim());
     return streamUrl ? { provider: "direct", streamUrl, downloadUrl: streamUrl } : {};
 }
 
@@ -514,7 +555,7 @@ function getEpisodeMedia() {
             const uInput = row.querySelector(".ep-url-input");
             const s = sInput ? sInput.value.trim() : "1";
             const e = eInput ? eInput.value.trim() : "1";
-            const url = uInput ? uInput.value.trim() : "";
+            const url = formatStreamUrl(uInput ? uInput.value.trim() : "");
             if (url) {
                 const key = `${s || 1}-${e || 1}`;
                 result[key] = { provider: "direct", streamUrl: url, downloadUrl: url };
@@ -565,7 +606,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   <input type="number" class="ep-number-input" min="1" value="${nextEp}" style="margin-top:4px;" />
                 </label>
                 <label style="margin:0;">Direct Video URL
-                  <input type="url" class="ep-url-input" placeholder="https://drive.google.com/uc?export=download&id=..." style="margin-top:4px;" />
+                  <input type="text" class="ep-url-input" placeholder="Paste Drive ID (e.g. 1ajx...) or direct URL" style="margin-top:4px;" />
                 </label>
                 <button type="button" class="remove-ep-row-btn" style="background:rgba(255,23,68,0.2); color:#ff1744; border:1px solid #ff1744; border-radius:6px; height:42px; padding:0 12px; cursor:pointer;" title="Remove">✕</button>
             `;
@@ -665,7 +706,7 @@ if (csForm) {
                 title: document.getElementById("csTitle").value.trim(),
                 description: document.getElementById("csDescription").value.trim(),
                 poster: document.getElementById("csPoster").value.trim(),
-                video: document.getElementById("csVideo").value.trim(),
+                video: formatStreamUrl(document.getElementById("csVideo").value.trim()),
                 seriesId: document.getElementById("csSeriesId").value.trim(),
                 fetchTmdb: true
             };
@@ -763,7 +804,7 @@ if (heroSlideForm) {
                 title: document.getElementById("heroTitleInput").value.trim(),
                 description: document.getElementById("heroDescInput").value.trim(),
                 poster: document.getElementById("heroPosterInput").value.trim(),
-                video: document.getElementById("heroVideoInput").value.trim(),
+                video: formatStreamUrl(document.getElementById("heroVideoInput").value.trim()),
                 position: positionVal !== "" ? Number(positionVal) : undefined,
                 fetchTmdb: true
             };
@@ -940,12 +981,12 @@ document.getElementById("editForm")?.addEventListener("submit", async (e) => {
         title: document.getElementById("editTitle").value.trim(),
         description: document.getElementById("editDescription").value.trim(),
         poster: document.getElementById("editPoster").value.trim(),
-        video: document.getElementById("editVideo").value.trim()
+        video: formatStreamUrl(document.getElementById("editVideo").value.trim())
     };
 
     const sNum = document.getElementById("editSeasonNumber")?.value.trim();
     const eNum = document.getElementById("editEpisodeNumber")?.value.trim();
-    const epUrl = document.getElementById("editEpisodeUrl")?.value.trim();
+    const epUrl = formatStreamUrl(document.getElementById("editEpisodeUrl")?.value.trim());
     if (sNum && eNum && epUrl) {
         payload.seasonNumber = sNum;
         payload.episodeNumber = eNum;

@@ -55,6 +55,22 @@ async function writeCatalog(catalog) {
   await fsPromises.writeFile(CATALOG_PATH, JSON.stringify(catalog, null, 2), "utf8");
 }
 
+function formatStreamUrl(input) {
+  if (!input) return "";
+  const str = String(input).trim().replace(/['"]/g, "");
+  if (!str) return "";
+  if (str.includes("drive.google.com")) {
+    const fileD = str.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileD) return `https://drive.google.com/uc?export=download&id=${fileD[1]}`;
+    const idParam = str.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (idParam) return `https://drive.google.com/uc?export=download&id=${idParam[1]}`;
+  }
+  if (!str.includes("://") && !str.includes("/") && !str.includes(" ") && /^[a-zA-Z0-9_-]{20,}$/.test(str)) {
+    return `https://drive.google.com/uc?export=download&id=${str}`;
+  }
+  return str;
+}
+
 /* =========================================================
    TMDB HELPERS
 ========================================================= */
@@ -231,6 +247,12 @@ async function handleRequest(req, res) {
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     const id = slug || uuidv4();
 
+    const media = body.media || {};
+    if (media.streamUrl) {
+      media.streamUrl = formatStreamUrl(media.streamUrl);
+      media.downloadUrl = media.streamUrl;
+    }
+
     const item = {
       id,
       kind: body.kind || "movie",
@@ -241,12 +263,20 @@ async function handleRequest(req, res) {
       poster: body.customPoster || tmdbImage(tmdbData?.poster_path),
       backdrop: tmdbImage(tmdbData?.backdrop_path, "w1280"),
       duration: "",
-      media: body.media || {},
+      media,
       showOnHome: true,
     };
 
     if (isSeries) {
       item.episodeMedia = body.episodeMedia || {};
+      if (item.episodeMedia && typeof item.episodeMedia === "object") {
+        for (const k of Object.keys(item.episodeMedia)) {
+          if (item.episodeMedia[k] && item.episodeMedia[k].streamUrl) {
+            item.episodeMedia[k].streamUrl = formatStreamUrl(item.episodeMedia[k].streamUrl);
+            item.episodeMedia[k].downloadUrl = item.episodeMedia[k].streamUrl;
+          }
+        }
+      }
       const seasons = [];
       const tvId = body.tmdbId || tmdbData?.id;
 
@@ -403,17 +433,18 @@ async function handleRequest(req, res) {
         if (body.poster !== undefined) list[idx].poster = body.poster;
         if (body.position !== undefined) list[idx].position = Number(body.position);
         if (body.video !== undefined) {
-          list[idx].video = body.video;
+          const formattedVideo = formatStreamUrl(body.video);
+          list[idx].video = formattedVideo;
           // Also update media if it's a catalog item
-          if (list[idx].media && body.video) {
-            list[idx].media.streamUrl = body.video;
-            list[idx].media.downloadUrl = body.video;
+          if (list[idx].media && formattedVideo) {
+            list[idx].media.streamUrl = formattedVideo;
+            list[idx].media.downloadUrl = formattedVideo;
           }
         }
         if (body.seasonNumber && body.episodeNumber && body.episodeUrl) {
           const sNum = parseInt(body.seasonNumber, 10);
           const eNum = parseInt(body.episodeNumber, 10);
-          const epUrl = String(body.episodeUrl).trim();
+          const epUrl = formatStreamUrl(String(body.episodeUrl).trim());
           if (sNum && eNum && epUrl) {
             if (!Array.isArray(list[idx].seasons)) list[idx].seasons = [];
             let season = list[idx].seasons.find(s => s.number === sNum);
@@ -518,7 +549,7 @@ async function handleRequest(req, res) {
       title,
       description: body.description || (tmdbData ? tmdbData.overview : ""),
       poster: body.poster || tmdbImage(tmdbData?.poster_path),
-      video: body.video || "",
+      video: formatStreamUrl(body.video || ""),
       seriesId: body.seriesId || "",
     };
 
@@ -556,7 +587,7 @@ async function handleRequest(req, res) {
       title,
       description: body.description || linkedItem?.description || (tmdbData ? tmdbData.overview : ""),
       poster: body.poster || linkedItem?.backdrop || linkedItem?.poster || tmdbImage(tmdbData?.backdrop_path || tmdbData?.poster_path, "w1280"),
-      video: body.video || linkedItem?.video || (linkedItem?.media && linkedItem.media.streamUrl) || "",
+      video: formatStreamUrl(body.video || linkedItem?.video || (linkedItem?.media && linkedItem.media.streamUrl) || ""),
       year: linkedItem?.year || (tmdbData ? String((tmdbData.release_date || tmdbData.first_air_date || "").slice(0, 4)) : ""),
       rating: linkedItem?.rating || (tmdbData ? String(tmdbData.vote_average || "") : ""),
       position: body.position !== undefined ? body.position : catalog.heroSlides.length + 1,
