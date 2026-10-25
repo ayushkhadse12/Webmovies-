@@ -183,6 +183,7 @@ async function loadManageCatalog() {
         if (movieInput && settings.movieCardSize) movieInput.value = settings.movieCardSize;
         if (seriesInput && settings.seriesCardSize) seriesInput.value = settings.seriesCardSize;
         if (songInput && settings.songCardSize) songInput.value = settings.songCardSize;
+        populateHeroSelect(items);
 
         if (items.length === 0 && comingSoon.length === 0 && heroSlides.length === 0) {
             container.innerHTML = `<p style="color: var(--muted); text-align: center; padding: 20px;">No items in the catalog yet.</p>`;
@@ -697,6 +698,53 @@ if (csForm) {
 }
 
 /* â”€â”€â”€ HERO SLIDE FORM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function populateHeroSelect(items) {
+    const sel = document.getElementById("heroLinkedItemSelect");
+    if (!sel) return;
+    const currentVal = sel.value;
+    sel.innerHTML = '<option value="">-- Choose from your catalog or enter manually below --</option>';
+    (items || []).forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item.id;
+        const typeLabel = item.kind === "series" ? "Web Series" : "Movie";
+        opt.textContent = "[" + typeLabel + "] " + item.title;
+        opt.dataset.title = item.title || "";
+        opt.dataset.type = typeLabel;
+        opt.dataset.desc = item.description || "";
+        opt.dataset.poster = item.backdrop || item.poster || "";
+        opt.dataset.video = item.video || (item.media && item.media.streamUrl) || "";
+        sel.appendChild(opt);
+    });
+    if (currentVal) sel.value = currentVal;
+}
+
+const heroLinkedSelect = document.getElementById("heroLinkedItemSelect");
+if (heroLinkedSelect) {
+    heroLinkedSelect.addEventListener("change", () => {
+        const opt = heroLinkedSelect.selectedOptions[0];
+        if (!opt || !opt.value) {
+            const mediaIdInput = document.getElementById("heroMediaIdInput");
+            if (mediaIdInput) mediaIdInput.value = "";
+            return;
+        }
+        const titleInput = document.getElementById("heroTitleInput");
+        const typeSelect = document.getElementById("heroTypeSelect");
+        const mediaIdInput = document.getElementById("heroMediaIdInput");
+        const descInput = document.getElementById("heroDescInput");
+        const posterInput = document.getElementById("heroPosterInput");
+        const videoInput = document.getElementById("heroVideoInput");
+
+        if (titleInput) titleInput.value = opt.dataset.title || "";
+        if (typeSelect) typeSelect.value = opt.dataset.type || "Movie";
+        if (mediaIdInput) mediaIdInput.value = opt.value;
+        if (descInput && opt.dataset.desc) descInput.value = opt.dataset.desc;
+        if (posterInput && opt.dataset.poster) posterInput.value = opt.dataset.poster;
+        if (videoInput && opt.dataset.video && !videoInput.value) {
+            videoInput.value = opt.dataset.video;
+        }
+    });
+}
+
 const heroSlideForm = document.getElementById("heroSlideForm");
 
 if (heroSlideForm) {
@@ -737,6 +785,8 @@ if (heroSlideForm) {
             message.textContent = `Added hero banner for "${addedTitle}"!`;
             message.className = "form-message success";
             heroSlideForm.reset();
+            const mediaIdInput = document.getElementById("heroMediaIdInput");
+            if (mediaIdInput) mediaIdInput.value = "";
             loadManageCatalog();
 
         } catch (error) {

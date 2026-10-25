@@ -534,21 +534,31 @@ async function handleRequest(req, res) {
     const catalog = await readCatalog();
     if (!catalog.heroSlides) catalog.heroSlides = [];
 
+    // Find linked item from catalog if mediaId or title is matched
+    const linkedItem = body.mediaId
+      ? (catalog.items || []).find(i => i.id === body.mediaId)
+      : (catalog.items || []).find(i => i.title && body.title && i.title.toLowerCase() === body.title.toLowerCase());
+
     let tmdbData = null;
-    if (body.fetchTmdb && body.title) {
-      tmdbData = await tmdbSearch(body.title, "movie");
+    if (body.fetchTmdb && body.title && !linkedItem) {
+      tmdbData = await tmdbSearch(body.title, body.type === "Web Series" ? "series" : "movie");
     }
 
-    const title = body.title || (tmdbData ? (tmdbData.title || tmdbData.name) : "Untitled");
+    const title = body.title || linkedItem?.title || (tmdbData ? (tmdbData.title || tmdbData.name) : "Untitled");
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const type = body.type || (linkedItem ? (linkedItem.kind === "series" ? "Web Series" : "Movie") : "Movie");
+    const mediaId = linkedItem ? linkedItem.id : (body.mediaId || "");
 
     const item = {
-      id: slug || uuidv4(),
+      id: `hero-${slug}-${Date.now()}`,
+      mediaId,
+      type,
       title,
-      description: body.description || (tmdbData ? tmdbData.overview : ""),
-      poster: body.poster || tmdbImage(tmdbData?.poster_path, "w1280"),
-      video: body.video || "",
-      year: tmdbData ? String((tmdbData.release_date || "").slice(0, 4)) : "",
+      description: body.description || linkedItem?.description || (tmdbData ? tmdbData.overview : ""),
+      poster: body.poster || linkedItem?.backdrop || linkedItem?.poster || tmdbImage(tmdbData?.backdrop_path || tmdbData?.poster_path, "w1280"),
+      video: body.video || linkedItem?.video || (linkedItem?.media && linkedItem.media.streamUrl) || "",
+      year: linkedItem?.year || (tmdbData ? String((tmdbData.release_date || tmdbData.first_air_date || "").slice(0, 4)) : ""),
+      rating: linkedItem?.rating || (tmdbData ? String(tmdbData.vote_average || "") : ""),
       position: body.position !== undefined ? body.position : catalog.heroSlides.length + 1,
     };
 

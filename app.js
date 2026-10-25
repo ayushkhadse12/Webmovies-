@@ -150,6 +150,14 @@ function initHeroTrack() {
         const slide = document.createElement("div");
         slide.className = "hero-slide";
         slide.dataset.index = index;
+        slide.style.cursor = "pointer";
+
+        slide.addEventListener("click", (event) => {
+            if (event.target.closest("#heroSoundButton") || event.target.closest(".hero-sound-button") || event.target.closest(".hero-dot") || event.target.closest(".hero-arrow")) {
+                return;
+            }
+            handleHeroAction(item);
+        });
         
         slide.innerHTML = `
             <img class="hero-poster" src="${item.poster}" alt="${escapeHtml(item.title)}">
@@ -400,38 +408,64 @@ heroSoundButton.addEventListener(
 
 
 /* =========================================================
-HERO PLAY
+HERO PLAY & ACTION
 ========================================================= */
+function handleHeroAction(item) {
+    if (!item) return;
+
+    const seriesCatalog = (typeof series !== "undefined" && Array.isArray(series)) ? series : [];
+    const moviesCatalog = (typeof movies !== "undefined" && Array.isArray(movies)) ? movies : [];
+
+    const matchedSeries = seriesCatalog.find(s => 
+        (item.mediaId && s.id === item.mediaId) ||
+        (item.id && s.id === item.id) ||
+        (s.title && item.title && s.title.trim().toLowerCase() === item.title.trim().toLowerCase())
+    );
+
+    const isWebSeries = Boolean(
+        item.type === "Web Series" || 
+        item.kind === "series" || 
+        matchedSeries
+    );
+
+    if (isWebSeries) {
+        const seriesId = matchedSeries ? matchedSeries.id : (item.mediaId || item.id);
+        window.location.href = `series.html?id=${encodeURIComponent(seriesId)}`;
+        return;
+    }
+
+    const matchedMovie = moviesCatalog.find(m =>
+        (item.mediaId && m.id === item.mediaId) ||
+        (item.id && m.id === item.id) ||
+        (m.title && item.title && m.title.trim().toLowerCase() === item.title.trim().toLowerCase())
+    );
+
+    const targetItem = matchedMovie || item;
+    const mediaId = targetItem.mediaId || targetItem.id;
+    const playbackUrl =
+        item.playback ||
+        targetItem.playback ||
+        (targetItem.playbackAvailable && mediaId
+            ? `/api/media/${encodeURIComponent(mediaId)}`
+            : "") ||
+        targetItem.video ||
+        "";
+
+    openPlayer(
+        targetItem.title || item.title,
+        playbackUrl,
+        targetItem
+    );
+}
+
 if (heroPlayButton) {
 heroPlayButton.addEventListener(
     "click",
-    () => {
-
+    (event) => {
+        event.stopPropagation();
         const item =
             heroSlides[currentHeroIndex];
-
-        // Web Series → open series page
-        if (item.type === "Web Series") {
-            const seriesId = item.mediaId || item.id;
-            window.location.href = `series.html?id=${encodeURIComponent(seriesId)}`;
-            return;
-        }
-
-        // Movie → open player
-        const playbackUrl =
-            item.playback ||
-            (item.playbackAvailable && item.id
-                ? `/api/media/${encodeURIComponent(item.id)}`
-                : "") ||
-            item.video ||
-            "";
-
-        openPlayer(
-            item.title,
-            playbackUrl,
-            item
-        );
-
+        handleHeroAction(item);
     }
 );
 }

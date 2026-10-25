@@ -343,10 +343,27 @@
 
         <section class="admin-card">
           <form id="heroSlideForm">
-            <label>
-              Title
-              <input id="heroTitleInput" type="text" required placeholder="Title of featured banner (e.g. Inception)" />
+            <label style="margin-bottom: 14px;">
+              Connect to Movie / Series <span>(optional — auto-fills info & connects play button)</span>
+              <select id="heroLinkedItemSelect">
+                <option value="">-- Choose from your catalog or enter manually below --</option>
+              </select>
             </label>
+            <input type="hidden" id="heroMediaIdInput" />
+
+            <div style="display: grid; grid-template-columns: 1fr 140px; gap: 10px;">
+              <label>
+                Title
+                <input id="heroTitleInput" type="text" required placeholder="Title of featured banner (e.g. Inception)" />
+              </label>
+              <label>
+                Type
+                <select id="heroTypeSelect">
+                  <option value="Movie">Movie</option>
+                  <option value="Web Series">Web Series</option>
+                </select>
+              </label>
+            </div>
 
             <label>
               Description
