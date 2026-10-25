@@ -420,6 +420,32 @@ function formatTime(seconds) {
 }
 
 /* =========================================================
+   GOOGLE DRIVE HELPERS
+========================================================= */
+
+const driveEmbedFrame = document.getElementById("driveEmbedFrame");
+let isDriveEmbed = false;
+
+function getDriveFileId(url) {
+    if (!url) return null;
+    const ucMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (ucMatch) return ucMatch[1];
+    const fdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (fdMatch) return fdMatch[1];
+    return null;
+}
+
+function isDriveUrl(url) {
+    return !!(url && url.includes("drive.google.com"));
+}
+
+function getDriveEmbedUrl(url) {
+    const id = getDriveFileId(url);
+    if (!id) return null;
+    return "https://drive.google.com/file/d/" + id + "/preview";
+}
+
+/* =========================================================
    MULTI-PART TIMELINE HELPERS
 ========================================================= */
 
@@ -2123,6 +2149,27 @@ async function prepareMultiPartPlayback() {
     activePlayer = videoPlayer;
     inactivePlayer = secondaryVideoPlayer;
 
+    // --- Google Drive detection: use iframe embed instead of <video> ---
+    const videoUrl = playerData.video || "";
+    if (isDriveUrl(videoUrl) && driveEmbedFrame) {
+        const embedUrl = getDriveEmbedUrl(videoUrl);
+        if (embedUrl) {
+            isDriveEmbed = true;
+            videoPlayer.style.display = "none";
+            secondaryVideoPlayer.style.display = "none";
+            driveEmbedFrame.src = embedUrl;
+            driveEmbedFrame.style.cssText = "display:block; border:none; background:#000; position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;";
+            const vc = document.getElementById("videoControls");
+            if (vc) vc.style.display = "none";
+            const vl = document.getElementById("videoLoader");
+            if (vl) vl.style.display = "none";
+            const cp = document.getElementById("centerPlayButton");
+            if (cp) cp.style.display = "none";
+            return;
+        }
+    }
+
+    isDriveEmbed = false;
     activePlayer.src = getPartUrl(0);
     activePlayer.style.display = "block";
     inactivePlayer.style.display = "none";
