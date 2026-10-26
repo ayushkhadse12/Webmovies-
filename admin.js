@@ -158,6 +158,9 @@ async function loadManageCatalog() {
         const heroSlides = catalog.heroSlides || [];
         const settings = catalog.settings || {};
 
+        // Populate Series Page Manager dropdown
+        populateSeriesCustomizer(catalog);
+
         // Filter lists
         const moviesList = items.filter(i => i.kind === "movie" || i.kind === "Movie" || (!i.kind && i.type === "Movie"));
         const seriesList = items.filter(i => i.kind === "series" || i.kind === "Series" || (!i.kind && i.type === "Web Series"));
@@ -1053,7 +1056,13 @@ function populateSeriesCustomizer(catalog) {
     const currentVal = select.value;
     select.innerHTML = '<option value="">-- Choose a Web Series --</option>';
 
-    const seriesList = (catalog.items || []).filter(i => i.kind === "series" || i.type === "Web Series");
+    const seriesList = (catalog.items || []).filter(i => 
+        i.kind === "series" || 
+        i.kind === "Series" || 
+        i.type === "Web Series" || 
+        i.type === "series" || 
+        (Array.isArray(i.seasons) && i.seasons.length > 0)
+    );
     seriesList.forEach(s => {
         const opt = document.createElement("option");
         opt.value = s.id;
