@@ -800,11 +800,13 @@ if (heroSlideForm) {
             if (!token) throw new Error("Not authenticated. Please sign in first.");
 
             const positionVal = document.getElementById("heroPositionInput").value;
+            const mediaIdInput = document.getElementById("heroMediaIdInput");
             const payload = {
                 title: document.getElementById("heroTitleInput").value.trim(),
                 description: document.getElementById("heroDescInput").value.trim(),
                 poster: document.getElementById("heroPosterInput").value.trim(),
                 video: formatStreamUrl(document.getElementById("heroVideoInput").value.trim()),
+                mediaId: mediaIdInput ? mediaIdInput.value.trim() : "",
                 position: positionVal !== "" ? Number(positionVal) : undefined,
                 fetchTmdb: true
             };
@@ -826,7 +828,6 @@ if (heroSlideForm) {
             message.textContent = `Added hero banner for "${addedTitle}"!`;
             message.className = "form-message success";
             heroSlideForm.reset();
-            const mediaIdInput = document.getElementById("heroMediaIdInput");
             if (mediaIdInput) mediaIdInput.value = "";
             loadManageCatalog();
 
@@ -1040,3 +1041,147 @@ function escapeHtml(value) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+/* ─── SERIES PAGE MANAGER ─────────────────────────────────────── */
+let cachedSeriesCatalog = null;
+
+function populateSeriesCustomizer(catalog) {
+    cachedSeriesCatalog = catalog;
+    const select = document.getElementById("seriesCustomSelect");
+    if (!select) return;
+
+    const currentVal = select.value;
+    select.innerHTML = '<option value="">-- Choose a Web Series --</option>';
+
+    const seriesList = (catalog.items || []).filter(i => i.kind === "series" || i.type === "Web Series");
+    seriesList.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = s.title;
+        select.appendChild(opt);
+    });
+
+    if (currentVal && seriesList.some(s => s.id === currentVal)) {
+        select.value = currentVal;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const select = document.getElementById("seriesCustomSelect");
+    const fields = document.getElementById("seriesCustomFields");
+    const form = document.getElementById("seriesCustomForm");
+    const enableCS = document.getElementById("seriesEnableCS");
+    const csFields = document.getElementById("seriesCSFields");
+
+    if (enableCS && csFields) {
+        enableCS.addEventListener("change", () => {
+            csFields.style.display = enableCS.checked ? "flex" : "none";
+        });
+    }
+
+    if (select && fields) {
+        select.addEventListener("change", () => {
+            const seriesId = select.value;
+            if (!seriesId || !cachedSeriesCatalog) {
+                fields.style.display = "none";
+                return;
+            }
+
+            const item = (cachedSeriesCatalog.items || []).find(i => i.id === seriesId);
+            if (!item) {
+                fields.style.display = "none";
+                return;
+            }
+
+            fields.style.display = "flex";
+
+            // Populate fields
+            document.getElementById("seriesCustomHeroVideo").value = item.heroVideo || item.trailerUrl || item.video || "";
+            document.getElementById("seriesCustomPosterSize").value = item.posterSize || "standard";
+            document.getElementById("seriesCustomBackdrop").value = item.backdrop || "";
+            document.getElementById("seriesCustomPoster").value = item.poster || "";
+            document.getElementById("seriesCustomTitle").value = item.title || "";
+            document.getElementById("seriesCustomDescription").value = item.description || "";
+
+            // Check if there is a Coming Soon season for this series
+            const csList = cachedSeriesCatalog.comingSoon || [];
+            const csSeason = csList.find(c => c.type === "season" && c.seriesId === seriesId);
+
+            if (csSeason) {
+                enableCS.checked = true;
+                csFields.style.display = "flex";
+                document.getElementById("seriesCSTitle").value = csSeason.title || "";
+                document.getElementById("seriesCSSize").value = csSeason.containerSize || "medium";
+                document.getElementById("seriesCSVideo").value = csSeason.video || "";
+                document.getElementById("seriesCSPoster").value = csSeason.poster || "";
+                document.getElementById("seriesCSDescription").value = csSeason.description || "";
+            } else {
+                enableCS.checked = false;
+                csFields.style.display = "none";
+                document.getElementById("seriesCSTitle").value = "";
+                document.getElementById("seriesCSSize").value = "medium";
+                document.getElementById("seriesCSVideo").value = "";
+                document.getElementById("seriesCSPoster").value = "";
+                document.getElementById("seriesCSDescription").value = "";
+            }
+        });
+    }
+
+    if (form) {
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const token = window._adminToken || "";
+            if (!token) return alert("Not authenticated. Please sign in.");
+
+            const select = document.getElementById("seriesCustomSelect");
+            const seriesId = select.value;
+            if (!seriesId) return;
+
+            const btn = document.getElementById("seriesCustomSaveBtn");
+            const msg = document.getElementById("seriesCustomMessage");
+
+            const payload = {
+                seriesId,
+                heroVideo: document.getElementById("seriesCustomHeroVideo").value.trim(),
+                posterSize: document.getElementById("seriesCustomPosterSize").value,
+                backdrop: document.getElementById("seriesCustomBackdrop").value.trim(),
+                poster: document.getElementById("seriesCustomPoster").value.trim(),
+                title: document.getElementById("seriesCustomTitle").value.trim(),
+                description: document.getElementById("seriesCustomDescription").value.trim(),
+                enableCS: document.getElementById("seriesEnableCS").checked,
+                csTitle: document.getElementById("seriesCSTitle").value.trim(),
+                csSize: document.getElementById("seriesCSSize").value,
+                csVideo: document.getElementById("seriesCSVideo").value.trim(),
+                csPoster: document.getElementById("seriesCSPoster").value.trim(),
+                csDescription: document.getElementById("seriesCSDescription").value.trim()
+            };
+
+            try {
+                btn.disabled = true;
+                msg.textContent = "Saving customizations...";
+                msg.className = "form-message";
+
+                const res = await fetch("/api/admin/series-customization", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Admin-Token": token
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Save failed.");
+
+                msg.textContent = "✓ Series customizations saved successfully!";
+                msg.className = "form-message success";
+                loadManageCatalog();
+            } catch (err) {
+                msg.textContent = "Error: " + err.message;
+                msg.className = "form-message error";
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    }
+});

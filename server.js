@@ -633,6 +633,60 @@ async function handleRequest(req, res) {
     return sendJson(res, 200, { ok: true, item });
   }
 
+
+  // --- POST /api/admin/series-customization ---
+  if (pathname === "/api/admin/series-customization" && method === "POST") {
+    if (!requireAdmin(req, res)) return;
+    const body = await parseBody(req);
+    const catalog = await readCatalog();
+    if (!catalog.items) catalog.items = [];
+    if (!catalog.comingSoon) catalog.comingSoon = [];
+
+    const item = catalog.items.find(i => i.id === body.seriesId);
+    if (!item) return sendJson(res, 404, { error: "Series not found in catalog." });
+
+    if (body.title) item.title = body.title;
+    if (body.description !== undefined) item.description = body.description;
+    if (body.poster) item.poster = body.poster;
+    if (body.backdrop) item.backdrop = body.backdrop;
+    if (body.posterSize) item.posterSize = body.posterSize;
+
+    if (body.heroVideo !== undefined) {
+      const formattedHero = formatStreamUrl(body.heroVideo);
+      item.heroVideo = formattedHero;
+      item.trailerUrl = formattedHero;
+    }
+
+    // Coming soon season handling
+    const csIdx = catalog.comingSoon.findIndex(cs => cs.type === "season" && cs.seriesId === body.seriesId);
+    if (body.enableCS) {
+      const formattedCSVideo = formatStreamUrl(body.csVideo);
+      const csEntry = {
+        id: csIdx !== -1 ? catalog.comingSoon[csIdx].id : `cs-season-${body.seriesId}-${Date.now()}`,
+        type: "season",
+        seriesId: body.seriesId,
+        title: body.csTitle || `${item.title} Next Season`,
+        description: body.csDescription || "",
+        poster: body.csPoster || item.backdrop || item.poster || "",
+        video: formattedCSVideo,
+        containerSize: body.csSize || "medium"
+      };
+
+      if (csIdx !== -1) {
+        catalog.comingSoon[csIdx] = csEntry;
+      } else {
+        catalog.comingSoon.push(csEntry);
+      }
+    } else {
+      if (csIdx !== -1) {
+        catalog.comingSoon.splice(csIdx, 1);
+      }
+    }
+
+    await writeCatalog(catalog);
+    return sendJson(res, 200, { ok: true, item });
+  }
+
   // --- POST /api/admin/hero-slide ---
   if (pathname === "/api/admin/hero-slide" && method === "POST") {
     if (!requireAdmin(req, res)) return;

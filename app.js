@@ -410,6 +410,18 @@ heroSoundButton.addEventListener(
 /* =========================================================
 HERO PLAY & ACTION
 ========================================================= */
+function navigateToDetailPage(item) {
+    if (!item) return;
+    // For series: go to the series detail page
+    if (item.type === "Web Series" || item.kind === "series") {
+        const id = item.mediaId || item.id;
+        window.location.href = "series.html?seriesId=" + encodeURIComponent(id);
+        return;
+    }
+    // For movies: use the standard hero action (opens player)
+    handleHeroAction(item);
+}
+
 function handleHeroAction(item) {
     if (!item) return;
 
@@ -473,6 +485,15 @@ heroPlayButton.addEventListener(
         handleHeroAction(item);
     }
 );
+}
+
+const heroInfoButton = document.getElementById("heroInfoButton");
+if (heroInfoButton) {
+    heroInfoButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const item = heroSlides[currentHeroIndex];
+        navigateToDetailPage(item);
+    });
 }
 /* =========================================================
    CARD CREATION
@@ -943,6 +964,19 @@ function renderLibraries() {
         if(downloadsLibrary) downloadsLibrary.appendChild(createMediaCard(item));
     });
 
+
+    // Re-apply cached size classes every time libraries are rendered
+    try {
+        const cached = JSON.parse(localStorage.getItem("webmovies_settings") || "{}");
+        const sizeClasses = ["size-small","size-medium","size-large","size-xlarge"];
+        const applyCachedGrid = (id, key) => {
+            const el = document.getElementById(id);
+            if (el && cached[key]) { el.classList.remove(...sizeClasses); el.classList.add("size-" + cached[key]); }
+        };
+        applyCachedGrid("moviesLibrary", "movieCardSize");
+        applyCachedGrid("seriesLibrary", "seriesCardSize");
+        applyCachedGrid("downloadsLibrary", "movieCardSize");
+    } catch(e) {}
 
     songs.forEach(song => {
 
@@ -1972,6 +2006,14 @@ async function loadServerCatalog() {
         applySize("seriesRow", "seriesCardSize");
         applySize("songsRow", "songCardSize");
 
+        // Apply to library grid pages (Movies/Series full-page grids)
+        applySize("moviesLibrary", "movieCardSize");
+        applySize("seriesLibrary", "seriesCardSize");
+        applySize("downloadsLibrary", "movieCardSize");
+
+        // Cache settings for instant startup
+        try { localStorage.setItem("webmovies_settings", JSON.stringify(sizeSettings)); } catch(e) {}
+
         console.log("WebMovies server catalog loaded.");
 
     } catch (error) {
@@ -2084,6 +2126,25 @@ function initializeWebMovies() {
     if (typeof updateProfileDisplay === "function") {
         updateProfileDisplay();
     }
+
+    // Apply cached settings immediately so layout is correct before network
+    try {
+        const cached = JSON.parse(localStorage.getItem("webmovies_settings") || "{}");
+        const sizeClasses = ["size-small", "size-medium", "size-large", "size-xlarge"];
+        const applyCached = (id, key) => {
+            const el = document.getElementById(id);
+            if (el && cached[key]) {
+                el.classList.remove(...sizeClasses);
+                el.classList.add("size-" + cached[key]);
+            }
+        };
+        applyCached("moviesRow", "movieCardSize");
+        applyCached("seriesRow", "seriesCardSize");
+        applyCached("songsRow", "songCardSize");
+        applyCached("moviesLibrary", "movieCardSize");
+        applyCached("seriesLibrary", "seriesCardSize");
+        applyCached("downloadsLibrary", "movieCardSize");
+    } catch(e) {}
 
     void loadServerCatalog();
     

@@ -240,14 +240,52 @@
                 if (csVideoTitle) csVideoTitle.textContent = csSeason.title || "Coming Soon";
                 if (csVideoDesc) csVideoDesc.textContent = csSeason.description || "";
 
-                if (csSeason.video && csVideo) {
-                    if (csPoster) csPoster.style.display = "none";
-                    csVideo.style.display = "block";
-                    csVideo.src = csSeason.video;
-                    csVideo.load();
-                    if (csVideoInfo) csVideoInfo.style.display = "";
+                const csContainer = $id("csSeasonContainer");
+                if (csContainer && csSeason.containerSize) {
+                    csContainer.className = "cs-size-" + csSeason.containerSize;
+                }
+
+                const csIframe = $id("csSeasonIframe");
+                const csSoundBtn = $id("csSeasonSoundButton");
+
+                if (csSeason.video) {
+                    const isDrive = csSeason.video.includes("drive.google.com") || /^[a-zA-Z0-9_-]{20,}$/.test(csSeason.video.trim());
+                    if (isDrive && csIframe) {
+                        if (csPoster) csPoster.style.display = "none";
+                        if (csVideo) csVideo.style.display = "none";
+                        let fileId = csSeason.video.trim();
+                        const m = fileId.match(/[?&]id=([a-zA-Z0-9_-]+)/) || fileId.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                        if (m) fileId = m[1];
+                        csIframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+                        csIframe.style.display = "block";
+                        if (csVideoInfo) csVideoInfo.style.display = "";
+                        if (csSoundBtn) csSoundBtn.style.display = "none";
+                    } else if (csVideo) {
+                        if (csPoster) csPoster.style.display = "none";
+                        if (csIframe) csIframe.style.display = "none";
+                        csVideo.style.display = "block";
+                        csVideo.src = csSeason.video;
+                        csVideo.loop = true;
+                        csVideo.muted = true;
+                        csVideo.load();
+                        csVideo.play().catch(() => {});
+                        if (csVideoInfo) csVideoInfo.style.display = "";
+                        if (csSoundBtn) {
+                            csSoundBtn.style.display = "flex";
+                            let csMuted = true;
+                            csSoundBtn.onclick = () => {
+                                csMuted = !csMuted;
+                                csVideo.muted = csMuted;
+                                csSoundBtn.textContent = csMuted ? "🔇" : "🔊";
+                            };
+                        }
+                    }
                 } else if (csSeason.poster && csPoster) {
+                    if (csVideo) csVideo.style.display = "none";
+                    if (csIframe) csIframe.style.display = "none";
+                    if (csSoundBtn) csSoundBtn.style.display = "none";
                     csPoster.src = csSeason.poster;
+                    csPoster.style.display = "block";
                     if (csInfo) csInfo.style.display = "";
                 }
             }

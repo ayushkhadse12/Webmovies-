@@ -547,3 +547,16 @@ main {
     }
 
 }
+/* ─── DYNAMIC SIZING CLASSES FOR SERIES HERO ────────────────── */
+.series-hero-image.size-compact { width: min(100%, 280px); aspect-ratio: 16 / 10; }
+.series-hero-image.size-standard { width: min(100%, 380px); aspect-ratio: 16 / 10; }
+.series-hero-image.size-large { width: min(100%, 500px); aspect-ratio: 16 / 9; }
+.series-hero-image.size-banner { width: min(100%, 650px); aspect-ratio: 16 / 9; }
+.series-hero-image.size-portrait-standard { width: min(100%, 300px); aspect-ratio: 2 / 3; }
+.series-hero-image.size-portrait-large { width: min(100%, 380px); aspect-ratio: 2 / 3; }
+
+/* ─── DYNAMIC SIZING FOR COMING SOON CONTAINER ──────────────── */
+#csSeasonContainer.cs-size-small { max-width: 480px; }
+#csSeasonContainer.cs-size-medium { max-width: 720px; }
+#csSeasonContainer.cs-size-large { max-width: 960px; }
+#csSeasonContainer.cs-size-full { max-width: 100%; }

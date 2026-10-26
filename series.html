@@ -30,6 +30,7 @@
         <div class="series-hero-image" id="seriesHeroImage">
           <img id="seriesPoster" src="" alt="" />
           <video id="seriesHeroVideo" autoplay muted loop playsinline preload="metadata"></video>
+          <iframe id="seriesHeroIframe" style="display:none; position:absolute; inset:0; width:100%; height:100%; border:none; background:#000; z-index:2;" allow="autoplay"></iframe>
           <button id="seriesSoundButton" type="button" class="series-sound-button" aria-label="Mute or unmute">🔇</button>
         </div>
 
@@ -58,6 +59,7 @@
         <div id="csSeasonContainer" style="position: relative; margin: 0 auto; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: max-width 0.3s ease;">
           <img id="csSeasonPoster" src="" alt="Coming Soon" style="width: 100%; height: auto; display: block;" />
           <video id="csSeasonVideo" autoplay muted loop playsinline preload="auto" style="width: 100%; height: auto; display: none;"></video>
+          <iframe id="csSeasonIframe" style="display:none; width:100%; aspect-ratio:16/9; border:none; background:#000;" allow="autoplay"></iframe>
           
           <div id="csSeasonPosterInfo" style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 20px 20px; text-align: left; display: none; pointer-events: none;">
             <div style="color: #ff1744; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px;">COMING SOON</div>

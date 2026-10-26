@@ -880,6 +880,32 @@ main {
   box-shadow: 0 12px 35px rgba(255,23,68,0.40);
 }
 
+.hero-info-button {
+  position: absolute;
+  z-index: 7;
+  left: calc(6% + 160px);
+  bottom: 8%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 135px;
+  height: 48px;
+  padding: 0 20px;
+  color: white;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255,255,255,0.32);
+  border-radius: 13px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.hero-info-button:hover {
+  background: rgba(255,255,255,0.28);
+  transform: translateY(-2px) scale(1.02);
+}
+
 .hero-sound-button {
 
   position: absolute;
@@ -1182,7 +1208,7 @@ HERO ARROWS
   grid-auto-flow: column;
 
   grid-auto-columns:
-      minmax(190px, 1fr);
+      minmax(clamp(160px, 18vw, 220px), 1fr);
 
   grid-template-rows: 1fr;
 
@@ -1278,11 +1304,16 @@ HERO ARROWS
 
   position: relative;
 
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 2 / 3;  /* Vertical movie-poster ratio */
 
   overflow: hidden;
 
   background: #17191f;
+}
+
+/* Songs use square album art */
+.song-row .media-card-image {
+  aspect-ratio: 1 / 1;
 }
 
 .media-card-image img {
@@ -1480,7 +1511,7 @@ HERO ARROWS
   grid-template-columns:
       repeat(
           auto-fill,
-          minmax(190px, 1fr)
+          minmax(200px, 1fr)
       );
 
   gap: 20px;
@@ -1964,6 +1995,15 @@ HERO ARROWS
       padding: 0 15px;
   }
 
+  .hero-info-button {
+      left: calc(7% + 138px);
+      bottom: 7%;
+      min-width: 115px;
+      height: 44px;
+      padding: 0 14px;
+      font-size: 13px;
+  }
+
   .hero-sound-button {
 
       right: 18px;
@@ -2296,7 +2336,7 @@ HERO ARROWS
 /* Each card — increased size */
 .cs-card {
   position: relative;
-  flex: 0 0 clamp(300px, 38vw, 500px);
+  flex: 0 0 clamp(185px, 20vw, 260px);
   aspect-ratio: 2 / 3;
   border-radius: var(--radius);
   overflow: hidden;
@@ -2312,16 +2352,16 @@ HERO ARROWS
 
 /* Coming Soon dynamic card sizes managed by Admin settings */
 .coming-soon-section.cs-size-small .cs-card {
-  flex: 0 0 clamp(180px, 22vw, 260px);
+  flex: 0 0 clamp(150px, 16vw, 195px);
 }
 .coming-soon-section.cs-size-medium .cs-card {
-  flex: 0 0 clamp(240px, 28vw, 360px);
+  flex: 0 0 clamp(185px, 20vw, 260px);
 }
 .coming-soon-section.cs-size-large .cs-card {
-  flex: 0 0 clamp(300px, 34vw, 460px);
+  flex: 0 0 clamp(225px, 24vw, 310px);
 }
 .coming-soon-section.cs-size-xlarge .cs-card {
-  flex: 0 0 clamp(360px, 40vw, 560px);
+  flex: 0 0 clamp(265px, 28vw, 360px);
 }
 
 /* Poster image */
@@ -2452,53 +2492,67 @@ HERO ARROWS
 }
 
 @media (max-width: 600px) {
-  .cs-card { flex: 0 0 72vw; }
+  .cs-card { flex: 0 0 54vw; max-width: 210px; }
   .cs-arrow { width: 34px; height: 34px; font-size: 18px; }
 }
 
 /* Custom Movie, Series, Song Card Sizes — Desktop */
 .card-row.size-small {
-  grid-auto-columns: minmax(clamp(120px, 14vw, 160px), 1fr);
+  grid-auto-columns: minmax(clamp(140px, 15vw, 180px), 1fr);
 }
 .card-row.size-medium {
-  grid-auto-columns: minmax(clamp(160px, 18vw, 210px), 1fr);
+  grid-auto-columns: minmax(clamp(175px, 19vw, 230px), 1fr);
 }
 .card-row.size-large {
-  grid-auto-columns: minmax(clamp(200px, 22vw, 260px), 1fr);
+  grid-auto-columns: minmax(clamp(215px, 24vw, 290px), 1fr);
 }
 .card-row.size-xlarge {
-  grid-auto-columns: minmax(clamp(240px, 28vw, 320px), 1fr);
+  grid-auto-columns: minmax(clamp(260px, 30vw, 360px), 1fr);
+}
+
+/* ── Library grid size classes (Movies / Series full-page grids) ── */
+.library-grid.size-small {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+}
+.library-grid.size-medium {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+}
+.library-grid.size-large {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+}
+.library-grid.size-xlarge {
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)) !important;
 }
 
 /* Tablet — max-width 768px */
 @media (max-width: 768px) {
   .card-row.size-small {
-    grid-auto-columns: minmax(110px, 32vw);
+    grid-auto-columns: minmax(130px, 35vw);
   }
   .card-row.size-medium {
-    grid-auto-columns: minmax(130px, 38vw);
+    grid-auto-columns: minmax(150px, 41vw);
   }
   .card-row.size-large {
-    grid-auto-columns: minmax(150px, 44vw);
+    grid-auto-columns: minmax(170px, 47vw);
   }
   .card-row.size-xlarge {
-    grid-auto-columns: minmax(170px, 50vw);
+    grid-auto-columns: minmax(190px, 53vw);
   }
 }
 
 /* Mobile — max-width 480px */
 @media (max-width: 480px) {
   .card-row.size-small {
-    grid-auto-columns: minmax(100px, 40vw);
+    grid-auto-columns: minmax(120px, 42vw);
   }
   .card-row.size-medium {
-    grid-auto-columns: minmax(120px, 44vw);
+    grid-auto-columns: minmax(140px, 46vw);
   }
   .card-row.size-large {
-    grid-auto-columns: minmax(140px, 50vw);
+    grid-auto-columns: minmax(160px, 52vw);
   }
   .card-row.size-xlarge {
-    grid-auto-columns: minmax(160px, 55vw);
+    grid-auto-columns: minmax(180px, 58vw);
   }
 }
 
@@ -2551,11 +2605,11 @@ HERO ARROWS
     box-shadow: 0 4px 12px rgba(0,0,0,.2);
 }
 .media-card-image {
-    position: relative; width: 100%; padding-top: 56.25%; /* 16:9 */
+    position: relative; width: 100%; aspect-ratio: 2 / 3;
     overflow: hidden;
 }
 .media-card-image img {
-    position: absolute; inset: 0; object-fit: cover;
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
 }
 .card-overlay {
     position: absolute; inset: 0;
@@ -2601,11 +2655,7 @@ HERO ARROWS
 }
 /* End of added CSS */
 
-/* Dynamic Coming Soon 16:9 Aspect Ratio */
-.coming-soon-section.cs-size-large .cs-card,
-.coming-soon-section.cs-size-xlarge .cs-card {
-  aspect-ratio: 16 / 9;
-}
+/* CS cards keep their 2:3 vertical poster ratio at all sizes */
 
 
 
@@ -2803,5 +2853,17 @@ HERO ARROWS
   .media-card-image:hover .card-hover-video.playing,
   .card-hover-video.playing {
     opacity: 1;
+  }
+}
+
+/* Hero More Info button — mobile adjustments */
+@media (max-width: 600px) {
+  .hero-info-button {
+    left: 5%;
+    bottom: calc(8% + 54px);
+    min-width: 110px;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 12px;
   }
 }

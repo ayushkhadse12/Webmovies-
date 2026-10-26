@@ -93,6 +93,15 @@
             <span class="dash-card-arrow">→</span>
           </button>
 
+          <button class="dash-card" data-section="sec-series-page">
+            <div class="dash-card-icon" style="--accent: #9c27b0;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+            </div>
+            <h3>Series Page Manager</h3>
+            <p>Customize hero preview video, poster sizes, and coming soon seasons.</p>
+            <span class="dash-card-arrow">→</span>
+          </button>
+
           <button class="dash-card" data-section="sec-hero">
             <div class="dash-card-icon" style="--accent: #ffca28;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -387,6 +396,116 @@
 
             <button id="heroSubmitButton" class="import-button" type="submit">Add Hero Poster</button>
             <p id="heroFormMessage" class="form-message" aria-live="polite"></p>
+          </form>
+        </section>
+      </main>
+
+      <!-- ── SERIES PAGE MANAGER ───────────────────────────────────── -->
+      <main class="section-page" id="sec-series-page">
+        <div class="section-top">
+          <button class="back-to-dash" data-back>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Dashboard
+          </button>
+          <div>
+            <p class="eyebrow">CUSTOMIZER</p>
+            <h2>Series Page Manager</h2>
+          </div>
+        </div>
+
+        <section class="admin-card">
+          <form id="seriesCustomForm">
+            <label style="font-size:1.05rem; font-weight:600;">
+              Select Web Series
+              <select id="seriesCustomSelect" style="margin-top:6px; font-size:1rem;" required>
+                <option value="">-- Choose a Web Series --</option>
+              </select>
+            </label>
+
+            <div id="seriesCustomFields" style="display:none; flex-direction:column; gap:18px; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px;">
+              <h3 style="color:#ff1744; margin:0; font-size:1.15rem;">1. Hero Banner & Preview Video</h3>
+              
+              <label>
+                Hero Preview Video URL or Google Drive ID <span>(Plays on loop in header preview)</span>
+                <input id="seriesCustomHeroVideo" type="text" placeholder="Paste Google Drive File ID or direct .mp4 link" />
+              </label>
+
+              <label>
+                Series Poster Sizing on Series Page
+                <select id="seriesCustomPosterSize">
+                  <option value="standard">Standard Landscape (380px, 16:10)</option>
+                  <option value="compact">Compact Landscape (280px)</option>
+                  <option value="large">Large Landscape (500px, 16:9)</option>
+                  <option value="banner">Extra Wide Banner (650px, 16:9)</option>
+                  <option value="portrait-standard">Portrait Poster (300px, 2:3)</option>
+                  <option value="portrait-large">Portrait Poster Large (380px, 2:3)</option>
+                </select>
+              </label>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <label>
+                  Backdrop / Header Image URL
+                  <input id="seriesCustomBackdrop" type="text" placeholder="https://image.tmdb.org/..." />
+                </label>
+                <label>
+                  Portrait Poster Image URL
+                  <input id="seriesCustomPoster" type="text" placeholder="https://image.tmdb.org/..." />
+                </label>
+              </div>
+
+              <label>
+                Series Title Override
+                <input id="seriesCustomTitle" type="text" />
+              </label>
+
+              <label>
+                Series Description / Overview
+                <textarea id="seriesCustomDescription" rows="3"></textarea>
+              </label>
+
+              <h3 style="color:#ff1744; margin:10px 0 0; font-size:1.15rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px;">2. "Coming Soon" Season Settings</h3>
+
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input type="checkbox" id="seriesEnableCS" style="width:20px; height:20px;" />
+                <span style="font-size:1rem; font-weight:600;">Enable Coming Soon Season section on this series page</span>
+              </label>
+
+              <div id="seriesCSFields" style="display:none; flex-direction:column; gap:14px; padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                  <label>
+                    Coming Soon Title <span>(e.g. Season 2 or Final Season)</span>
+                    <input id="seriesCSTitle" type="text" placeholder="e.g. Season 2" />
+                  </label>
+                  <label>
+                    Coming Soon Display Size
+                    <select id="seriesCSSize">
+                      <option value="medium">Medium Width (720px)</option>
+                      <option value="small">Small Width (480px)</option>
+                      <option value="large">Large Width (960px)</option>
+                      <option value="full">Full Page Width (100%)</option>
+                    </select>
+                  </label>
+                </div>
+
+                <label>
+                  Trailer / Preview Video URL or Drive ID <span>(Plays in infinite loop)</span>
+                  <input id="seriesCSVideo" type="text" placeholder="Paste Google Drive ID or direct .mp4 link" />
+                </label>
+
+                <label>
+                  Season Poster / Backdrop Image URL <span>(Shown if no video, or as poster)</span>
+                  <input id="seriesCSPoster" type="text" placeholder="https://..." />
+                </label>
+
+                <label>
+                  Coming Soon Description / Synopsis
+                  <textarea id="seriesCSDescription" rows="2" placeholder="Brief info about the upcoming season..."></textarea>
+                </label>
+              </div>
+
+              <button type="submit" id="seriesCustomSaveBtn" class="import-button" style="margin-top:10px;">Save Series Page Customizations</button>
+              <p id="seriesCustomMessage" class="form-message" aria-live="polite"></p>
+            </div>
           </form>
         </section>
       </main>
