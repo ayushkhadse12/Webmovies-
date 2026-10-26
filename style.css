@@ -806,7 +806,25 @@ main {
   transform: translateY(12px);
 }
 
-.hero-kicker,
+.hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 5px 14px;
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(255, 23, 68, 0.9), rgba(255, 82, 82, 0.7));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 20px rgba(255, 23, 68, 0.35);
+  backdrop-filter: blur(10px);
+}
+
 .section-kicker {
   margin-bottom: 8px;
   color: var(--red);
@@ -817,37 +835,60 @@ main {
 }
 
 .hero-content h1 {
-  margin-bottom: 15px;
-  font-family: "Poppins", sans-serif;
-  font-size: clamp(44px, 5vw, 78px);
-  line-height: .98;
-  letter-spacing: -3px;
-  text-shadow: 0 5px 30px rgba(0,0,0,0.45);
+  margin-bottom: 16px;
+  font-family: 'Outfit', 'Poppins', sans-serif;
+  font-size: clamp(46px, 5.5vw, 84px);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, #ffffff 40%, #e2e8f0 75%, #ff80ab 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.95)) drop-shadow(0 15px 35px rgba(255, 23, 68, 0.22));
 }
 
 .hero-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
-  margin-bottom: 15px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
 .hero-meta span {
-  padding: 7px 10px;
-  color: white;
-  background: rgba(10,11,14,0.75);
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 7px;
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  color: #f1f5f9;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
   font-weight: 700;
-  backdrop-filter: blur(8px);
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.hero-meta span:first-child {
+  color: #ffd700;
+  border-color: rgba(255, 215, 0, 0.4);
+  background: rgba(255, 215, 0, 0.1);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 .hero-description {
-  max-width: 500px;
-  color: #d4d6dc;
-  font-size: 15px;
-  line-height: 1.6;
+  max-width: 580px;
+  color: #e2e8f0;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  padding-left: 14px;
+  border-left: 3px solid #ff1744;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+  margin-bottom: 24px;
 }
 
 
