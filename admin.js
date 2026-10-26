@@ -160,6 +160,7 @@ async function loadManageCatalog() {
 
         // Populate Series Page Manager dropdown
         populateSeriesCustomizer(catalog);
+        checkDatabaseStatus();
 
         // Filter lists
         const moviesList = items.filter(i => i.kind === "movie" || i.kind === "Movie" || (!i.kind && i.type === "Movie"));
@@ -1194,3 +1195,39 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+async function checkDatabaseStatus() {
+    const bar = document.getElementById("dbStatusBar");
+    if (!bar) return;
+
+    try {
+        const res = await fetch("/api/admin/db-status");
+        if (!res.ok) return;
+        const data = await res.json();
+
+        bar.style.display = "block";
+
+        if (data.connected) {
+            bar.style.background = "rgba(46, 213, 115, 0.12)";
+            bar.style.border = "1px solid rgba(46, 213, 115, 0.35)";
+            bar.style.color = "#2ed573";
+            bar.innerHTML = '<strong>🟢 Cloud Database Connected: MongoDB Atlas</strong><br><span style="color:rgba(255,255,255,0.8); font-size:0.88rem;">All changes (posters, hero slides, web series episodes) are permanently saved and will never be lost when Render restarts.</span>';
+        } else {
+            bar.style.background = "rgba(255, 71, 87, 0.12)";
+            bar.style.border = "1px solid rgba(255, 71, 87, 0.45)";
+            bar.style.color = "#ff4757";
+
+            let details = data.error || "MONGODB_URI environment variable is missing on Render.";
+            bar.innerHTML = `
+                <strong>⚠️ Cloud Database NOT Connected (Using Temporary Disk)</strong><br>
+                <span style="color:rgba(255,255,255,0.85); font-size:0.88rem;">
+                    <strong>Why changes disappear:</strong> Your server is saving to temporary disk. Whenever Render restarts or sleeps, Render wipes the disk and resets to the old catalog.<br>
+                    <strong>Reason:</strong> ${details}<br>
+                    <strong>How to fix:</strong> Add <code>MONGODB_URI</code> in Render Dashboard &rarr; Environment Variables with your MongoDB connection string (make sure to replace <code>&lt;password&gt;</code> with your real password).
+                </span>
+            `;
+        }
+    } catch (e) {
+        console.warn("Could not check db status", e);
+    }
+}

@@ -42,21 +42,30 @@ const CATALOG_PATH = path.join(__dirname, "data", "catalog.json");
 const UPLOADS_DIR = path.join(__dirname, "data", "uploads");
 
 // Optional Cloud Database: MongoDB Atlas
-const MONGODB_URI = process.env.MONGODB_URI || ENV.MONGODB_URI || "";
 let mongoClient = null;
 let mongoDb = null;
+let lastMongoError = null;
 
 async function getMongoDb() {
-  if (!MONGODB_URI) return null;
+  const currentUri = process.env.MONGODB_URI || ENV.MONGODB_URI || "";
+  if (!currentUri) {
+    lastMongoError = "MONGODB_URI environment variable is missing on Render. Using temporary disk.";
+    return null;
+  }
   if (mongoDb) return mongoDb;
   try {
     const { MongoClient } = require("mongodb");
-    mongoClient = new MongoClient(MONGODB_URI);
+    mongoClient = new MongoClient(currentUri, {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000
+    });
     await mongoClient.connect();
     mongoDb = mongoClient.db();
+    lastMongoError = null;
     console.log("[Database] Connected to MongoDB Atlas");
     return mongoDb;
   } catch (err) {
+    lastMongoError = err.message;
     console.error("[Database] MongoDB connection error:", err.message);
     return null;
   }
@@ -272,6 +281,18 @@ async function handleRequest(req, res) {
   }
 
   // ======================= API ROUTES =======================
+
+  // --- GET /api/admin/db-status ---
+  if (pathname === "/api/admin/db-status" && method === "GET") {
+    const db = await getMongoDb();
+    const currentUri = process.env.MONGODB_URI || ENV.MONGODB_URI || "";
+    return sendJson(res, 200, {
+      connected: Boolean(db),
+      database: db ? "mongodb" : "local_ephemeral",
+      uriPresent: Boolean(currentUri),
+      error: lastMongoError
+    });
+  }
 
   // --- GET /api/catalog ---
   if (pathname === "/api/catalog" && method === "GET") {
