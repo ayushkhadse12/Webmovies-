@@ -841,10 +841,8 @@ main {
   font-weight: 900;
   line-height: 1.02;
   letter-spacing: -2px;
-  background: linear-gradient(135deg, #ffffff 40%, #e2e8f0 75%, #ff80ab 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.95)) drop-shadow(0 15px 35px rgba(255, 23, 68, 0.22));
+  color: #ffffff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.95), 0 2px 6px rgba(0, 0, 0, 0.9);
 }
 
 .hero-meta {
