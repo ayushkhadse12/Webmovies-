@@ -1791,16 +1791,36 @@ function renderComingSoonSlider(items, settings) {
             }
         }
         
-        if (item.video) {
+        const videoUrl = (item.video || "").trim();
+        const hasVideo = Boolean(videoUrl);
+
+        // Direct video files can play native HTML5 hover previews
+        const isDirectVideo = hasVideo && (
+            videoUrl.includes(".mp4") ||
+            videoUrl.includes(".webm") ||
+            videoUrl.includes(".ogg") ||
+            videoUrl.startsWith("/assets/") ||
+            videoUrl.startsWith("blob:") ||
+            videoUrl.includes("gtv-videos-bucket")
+        );
+        
+        if (hasVideo) {
             card.classList.add("has-video");
             card.style.aspectRatio = "auto";
             card.style.backgroundColor = "var(--panel-light)";
+            card.style.cursor = "pointer";
+            card.setAttribute("title", "Click to watch trailer");
 
             card.innerHTML = `
                 <div class="cs-video-wrapper">
                     <img class="cs-card-poster" src="${imageSrc}" alt="${escapeHtml(displayTitle)}" loading="lazy">
-                    <video class="cs-card-video" src="${item.video}" playsinline preload="metadata" loop muted></video>
-                    <button class="cs-unmute-btn" type="button" aria-label="Unmute preview">🔇</button>
+                    ${isDirectVideo ? `
+                        <video class="cs-card-video" src="${videoUrl}" playsinline preload="metadata" loop muted></video>
+                        <button class="cs-unmute-btn" type="button" aria-label="Unmute preview">🔇</button>
+                    ` : ''}
+                    <div class="cs-play-overlay">
+                        <button class="cs-play-btn" type="button" aria-label="Play Trailer">▶</button>
+                    </div>
                 </div>
                 <div class="cs-info-below">
                     <div class="cs-card-badge">COMING SOON</div>
@@ -1812,39 +1832,60 @@ function renderComingSoonSlider(items, settings) {
             const videoEl = card.querySelector(".cs-card-video");
             const muteBtn = card.querySelector(".cs-unmute-btn");
 
-            const setPreviewState = (playing) => {
-                card.classList.toggle("preview-playing", playing);
-                if (playing) {
-                    muteBtn.style.opacity = "1";
-                    muteBtn.style.visibility = "visible";
-                } else {
-                    muteBtn.style.opacity = "0";
-                    muteBtn.style.visibility = "hidden";
+            if (videoEl) {
+                let hoverTimeout = null;
+
+                card.addEventListener("mouseenter", () => {
+                    hoverTimeout = setTimeout(() => {
+                        videoEl.muted = true;
+                        if (muteBtn) muteBtn.textContent = "🔇";
+                        const playPromise = videoEl.play();
+                        if (playPromise !== undefined) {
+                            playPromise
+                                .then(() => {
+                                    card.classList.add("preview-playing");
+                                    if (muteBtn) {
+                                        muteBtn.style.opacity = "1";
+                                        muteBtn.style.visibility = "visible";
+                                    }
+                                })
+                                .catch(() => {
+                                    card.classList.remove("preview-playing");
+                                });
+                        }
+                    }, 120);
+                });
+
+                card.addEventListener("mouseleave", () => {
+                    clearTimeout(hoverTimeout);
+                    card.classList.remove("preview-playing");
+                    videoEl.pause();
+                    if (muteBtn) {
+                        muteBtn.style.opacity = "0";
+                        muteBtn.style.visibility = "hidden";
+                    }
+                    try {
+                        if (videoEl.readyState > 0) {
+                            videoEl.currentTime = 0;
+                        }
+                    } catch (_) {}
+                });
+
+                if (muteBtn) {
+                    muteBtn.addEventListener("click", event => {
+                        event.stopPropagation();
+                        videoEl.muted = !videoEl.muted;
+                        muteBtn.textContent = videoEl.muted ? "🔇" : "🔊";
+                    });
                 }
-            };
+            }
 
-            card.addEventListener("mouseenter", () => {
-                if (!videoEl) return;
-                videoEl.currentTime = 0;
-                videoEl.muted = true;
-                muteBtn.textContent = "🔇";
-                setPreviewState(true);
-                videoEl.play().catch(() => {});
+            // Click anywhere on card (or play button) to open player and play video
+            card.addEventListener("click", event => {
+                if (event.target.closest(".cs-unmute-btn")) return;
+                openPlayer(displayTitle, videoUrl, item);
             });
 
-            card.addEventListener("mouseleave", () => {
-                if (!videoEl) return;
-                videoEl.pause();
-                videoEl.currentTime = 0;
-                setPreviewState(false);
-            });
-
-            muteBtn.addEventListener("click", event => {
-                event.stopPropagation();
-                if (!videoEl) return;
-                videoEl.muted = !videoEl.muted;
-                muteBtn.textContent = videoEl.muted ? "🔇" : "🔊";
-            });
         } else {
             // Fallback layout when there is no video (Poster with gradient overlay)
             card.innerHTML = `

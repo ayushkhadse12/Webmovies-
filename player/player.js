@@ -439,6 +439,18 @@ function getDriveFileId(url) {
     return null;
 }
 
+
+function isYouTubeUrl(url) {
+    if (!url) return false;
+    return !!(url.includes("youtube.com") || url.includes("youtu.be"));
+}
+
+function getYouTubeEmbedUrl(url) {
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    return match ? "https://www.youtube-nocookie.com/embed/" + match[1] + "?autoplay=1&rel=0" : null;
+}
+
 function isDriveUrl(url) {
     if (!url) return false;
     return !!(url.includes("drive.google.com") || getDriveFileId(url));
@@ -2175,8 +2187,8 @@ async function prepareMultiPartPlayback() {
     }
 
     // --- Google Drive detection: use iframe embed instead of <video> ---
-    if (isDriveUrl(videoUrl) && driveEmbedFrame) {
-        const embedUrl = getDriveEmbedUrl(videoUrl);
+    if ((isDriveUrl(videoUrl) || isYouTubeUrl(videoUrl)) && driveEmbedFrame) {
+        const embedUrl = isYouTubeUrl(videoUrl) ? getYouTubeEmbedUrl(videoUrl) : getDriveEmbedUrl(videoUrl);
         if (embedUrl) {
             isDriveEmbed = true;
             videoPlayer.style.display = "none";
