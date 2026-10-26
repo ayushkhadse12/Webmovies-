@@ -2391,16 +2391,58 @@ HERO ARROWS
 
 /* Coming Soon dynamic card sizes managed by Admin settings */
 .coming-soon-section.cs-size-small .cs-card {
-  flex: 0 0 clamp(150px, 16vw, 195px);
+  flex: 0 0 150px !important;
+  max-width: 150px !important;
 }
 .coming-soon-section.cs-size-medium .cs-card {
-  flex: 0 0 clamp(185px, 20vw, 260px);
+  flex: 0 0 200px !important;
+  max-width: 200px !important;
 }
 .coming-soon-section.cs-size-large .cs-card {
-  flex: 0 0 clamp(225px, 24vw, 310px);
+  flex: 0 0 270px !important;
+  max-width: 270px !important;
 }
 .coming-soon-section.cs-size-xlarge .cs-card {
-  flex: 0 0 clamp(265px, 28vw, 360px);
+  flex: 0 0 340px !important;
+  max-width: 340px !important;
+}
+
+@media (max-width: 768px) {
+  .coming-soon-section.cs-size-small .cs-card {
+    flex: 0 0 130px !important;
+    max-width: 130px !important;
+  }
+  .coming-soon-section.cs-size-medium .cs-card {
+    flex: 0 0 165px !important;
+    max-width: 165px !important;
+  }
+  .coming-soon-section.cs-size-large .cs-card {
+    flex: 0 0 220px !important;
+    max-width: 220px !important;
+  }
+  .coming-soon-section.cs-size-xlarge .cs-card {
+    flex: 0 0 280px !important;
+    max-width: 280px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .coming-soon-section.cs-size-small .cs-card {
+    flex: 0 0 115px !important;
+    max-width: 115px !important;
+  }
+  .coming-soon-section.cs-size-medium .cs-card {
+    flex: 0 0 145px !important;
+    max-width: 145px !important;
+  }
+  .coming-soon-section.cs-size-large .cs-card {
+    flex: 0 0 190px !important;
+    max-width: 190px !important;
+  }
+  .coming-soon-section.cs-size-xlarge .cs-card {
+    flex: 0 0 240px !important;
+    max-width: 240px !important;
+  }
 }
 
 /* Poster image */
@@ -2537,61 +2579,61 @@ HERO ARROWS
 
 /* Custom Movie, Series, Song Card Sizes — Desktop */
 .card-row.size-small {
-  grid-auto-columns: minmax(clamp(140px, 15vw, 180px), 1fr);
+  grid-auto-columns: 145px !important;
 }
 .card-row.size-medium {
-  grid-auto-columns: minmax(clamp(175px, 19vw, 230px), 1fr);
+  grid-auto-columns: 200px !important;
 }
 .card-row.size-large {
-  grid-auto-columns: minmax(clamp(215px, 24vw, 290px), 1fr);
+  grid-auto-columns: 270px !important;
 }
 .card-row.size-xlarge {
-  grid-auto-columns: minmax(clamp(260px, 30vw, 360px), 1fr);
+  grid-auto-columns: 340px !important;
 }
 
 /* ── Library grid size classes (Movies / Series full-page grids) ── */
 .library-grid.size-small {
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
 }
 .library-grid.size-medium {
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
 }
 .library-grid.size-large {
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)) !important;
 }
 .library-grid.size-xlarge {
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
 }
 
 /* Tablet — max-width 768px */
 @media (max-width: 768px) {
   .card-row.size-small {
-    grid-auto-columns: minmax(130px, 35vw);
+    grid-auto-columns: 125px !important;
   }
   .card-row.size-medium {
-    grid-auto-columns: minmax(150px, 41vw);
+    grid-auto-columns: 165px !important;
   }
   .card-row.size-large {
-    grid-auto-columns: minmax(170px, 47vw);
+    grid-auto-columns: 215px !important;
   }
   .card-row.size-xlarge {
-    grid-auto-columns: minmax(190px, 53vw);
+    grid-auto-columns: 275px !important;
   }
 }
 
 /* Mobile — max-width 480px */
 @media (max-width: 480px) {
   .card-row.size-small {
-    grid-auto-columns: minmax(120px, 42vw);
+    grid-auto-columns: 110px !important;
   }
   .card-row.size-medium {
-    grid-auto-columns: minmax(140px, 46vw);
+    grid-auto-columns: 145px !important;
   }
   .card-row.size-large {
-    grid-auto-columns: minmax(160px, 52vw);
+    grid-auto-columns: 185px !important;
   }
   .card-row.size-xlarge {
-    grid-auto-columns: minmax(180px, 58vw);
+    grid-auto-columns: 235px !important;
   }
 }
 

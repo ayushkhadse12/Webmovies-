@@ -522,20 +522,72 @@
           </button>
           <div>
             <p class="eyebrow">PREFERENCES</p>
-            <h2>Homepage Settings</h2>
+            <h2>Homepage Poster Sizes & Settings</h2>
           </div>
         </div>
 
         <section class="info-guide">
           <h3>📖 How it works</h3>
           <ul>
-            <li>General homepage preferences will appear here as new features are added.</li>
-            <li>Poster sizes are now managed directly inside <strong>Manage Catalog</strong>.</li>
+            <li>Choose how large or compact posters appear across different sections of your homepage.</li>
+            <li>Select your preferred size: <strong>Small</strong>, <strong>Medium</strong>, <strong>Large</strong>, or <strong>Extra Large</strong>.</li>
+            <li>Click <strong>Save Poster Sizes</strong> to apply changes instantly and permanently to the database.</li>
           </ul>
         </section>
 
         <section class="admin-card">
-          <p style="color: var(--muted); text-align: center; padding: 20px;">Poster size controls have been moved to the <strong>Manage Catalog</strong> section for easier access.</p>
+          <h3 style="margin: 0 0 16px; font-family: Poppins, sans-serif; font-size: 16px; color: var(--text);">📐 Customize Poster Sizes</h3>
+          <form id="settingsForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <label>
+              Movies Row Poster Size
+              <select id="movieCardSizeInput">
+                <option value="small">Small (Compact, fits more)</option>
+                <option value="medium" selected>Medium (Standard)</option>
+                <option value="large">Large (High Impact)</option>
+                <option value="xlarge">Extra Large (Cinematic)</option>
+              </select>
+            </label>
+            <label>
+              Web Series Row Poster Size
+              <select id="seriesCardSizeInput">
+                <option value="small">Small (Compact, fits more)</option>
+                <option value="medium" selected>Medium (Standard)</option>
+                <option value="large">Large (High Impact)</option>
+                <option value="xlarge">Extra Large (Cinematic)</option>
+              </select>
+            </label>
+            <label>
+              Songs Row Poster Size
+              <select id="songCardSizeInput">
+                <option value="small">Small (Compact)</option>
+                <option value="medium" selected>Medium (Standard)</option>
+                <option value="large">Large (High Impact)</option>
+                <option value="xlarge">Extra Large (Large Art)</option>
+              </select>
+            </label>
+            <label>
+              Coming Soon Poster Size
+              <select id="csCardSizeInput">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+              </select>
+            </label>
+            <label>
+              Season Coming Soon Size
+              <select id="seasonCsCardSizeInput">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+                <option value="xlarge">Extra Large</option>
+              </select>
+            </label>
+            <div style="grid-column: 1 / -1; margin-top: 8px;">
+              <button id="settingsSubmitButton" class="import-button" type="submit" style="width: 100%;">Save Poster Sizes</button>
+              <p id="settingsFormMessage" class="form-message" aria-live="polite"></p>
+            </div>
+          </form>
         </section>
       </main>
 
@@ -562,60 +614,7 @@
           </ul>
         </section>
 
-        <section class="admin-card">
-          <h3 style="margin: 0 0 14px; font-family: Poppins, sans-serif; font-size: 15px; color: var(--text);">📐 Homepage Poster Sizes</h3>
-          <form id="settingsForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <label>
-              Movies
-              <select id="movieCardSizeInput">
-                <option value="small">Small</option>
-                <option value="medium" selected>Medium</option>
-                <option value="large">Large</option>
-                <option value="xlarge">Extra Large</option>
-              </select>
-            </label>
-            <label>
-              Web Series
-              <select id="seriesCardSizeInput">
-                <option value="small">Small</option>
-                <option value="medium" selected>Medium</option>
-                <option value="large">Large</option>
-                <option value="xlarge">Extra Large</option>
-              </select>
-            </label>
-            <label>
-              Songs
-              <select id="songCardSizeInput">
-                <option value="small">Small</option>
-                <option value="medium" selected>Medium</option>
-                <option value="large">Large</option>
-                <option value="xlarge">Extra Large</option>
-              </select>
-            </label>
-            <label>
-              Coming Soon
-              <select id="csCardSizeInput">
-                <option value="small">Small</option>
-                <option value="medium" selected>Medium</option>
-                <option value="large">Large</option>
-                <option value="xlarge">Extra Large</option>
-              </select>
-            </label>
-            <label>
-              Season Coming Soon
-              <select id="seasonCsCardSizeInput">
-                <option value="small">Small</option>
-                <option value="medium" selected>Medium</option>
-                <option value="large">Large</option>
-                <option value="xlarge">Extra Large</option>
-              </select>
-            </label>
-            <div style="grid-column: 1 / -1;">
-              <button id="settingsSubmitButton" class="import-button" type="submit" style="width: 100%;">Save Poster Sizes</button>
-              <p id="settingsFormMessage" class="form-message" aria-live="polite"></p>
-            </div>
-          </form>
-        </section>
+
 
         <section class="admin-card">
           <div class="manage-list" id="manageList">
