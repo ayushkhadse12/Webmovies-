@@ -41,7 +41,59 @@ const TMDB_BEARER = process.env.TMDB_BEARER_TOKEN || ENV.TMDB_BEARER_TOKEN || ""
 const CATALOG_PATH = path.join(__dirname, "data", "catalog.json");
 const UPLOADS_DIR = path.join(__dirname, "data", "uploads");
 
+// Optional Cloud Database: MongoDB Atlas
+const MONGODB_URI = process.env.MONGODB_URI || ENV.MONGODB_URI || "";
+let mongoClient = null;
+let mongoDb = null;
+
+async function getMongoDb() {
+  if (!MONGODB_URI) return null;
+  if (mongoDb) return mongoDb;
+  try {
+    const { MongoClient } = require("mongodb");
+    mongoClient = new MongoClient(MONGODB_URI);
+    await mongoClient.connect();
+    mongoDb = mongoClient.db();
+    console.log("[Database] Connected to MongoDB Atlas");
+    return mongoDb;
+  } catch (err) {
+    console.error("[Database] MongoDB connection error:", err.message);
+    return null;
+  }
+}
+
 async function readCatalog() {
+  const db = await getMongoDb();
+  if (db) {
+    try {
+      const doc = await db.collection("catalog").findOne({ _id: "main" });
+      if (doc) {
+        return {
+          items: doc.items || [],
+          comingSoon: doc.comingSoon || [],
+          heroSlides: doc.heroSlides || [],
+          settings: doc.settings || {}
+        };
+      }
+      // Migrate initial data from catalog.json if DB is empty
+      const raw = await fsPromises.readFile(CATALOG_PATH, "utf8").catch(() => "{}");
+      const local = JSON.parse(raw || "{}");
+      const initial = {
+        _id: "main",
+        items: local.items || [],
+        comingSoon: local.comingSoon || [],
+        heroSlides: local.heroSlides || [],
+        settings: local.settings || {}
+      };
+      await db.collection("catalog").insertOne(initial);
+      console.log("[Database] Migrated local catalog to MongoDB Atlas");
+      return initial;
+    } catch (e) {
+      console.error("[Database] Error reading from MongoDB:", e.message);
+    }
+  }
+
+  // Fallback to local catalog.json
   try {
     const raw = await fsPromises.readFile(CATALOG_PATH, "utf8");
     return JSON.parse(raw);
@@ -51,6 +103,29 @@ async function readCatalog() {
 }
 
 async function writeCatalog(catalog) {
+  const db = await getMongoDb();
+  if (db) {
+    try {
+      await db.collection("catalog").updateOne(
+        { _id: "main" },
+        {
+          $set: {
+            items: catalog.items || [],
+            comingSoon: catalog.comingSoon || [],
+            heroSlides: catalog.heroSlides || [],
+            settings: catalog.settings || {},
+            updatedAt: new Date()
+          }
+        },
+        { upsert: true }
+      );
+      return;
+    } catch (e) {
+      console.error("[Database] Error writing to MongoDB:", e.message);
+    }
+  }
+
+  // Local fallback
   await fsPromises.mkdir(path.dirname(CATALOG_PATH), { recursive: true });
   await fsPromises.writeFile(CATALOG_PATH, JSON.stringify(catalog, null, 2), "utf8");
 }
