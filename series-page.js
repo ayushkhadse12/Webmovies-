@@ -22,6 +22,16 @@
     // support both ?id= (new) and ?seriesId= (legacy)
     const SERIES_ID = params.get("id") || params.get("seriesId") || "";
 
+    // Track series page view
+    try {
+        fetch("/api/analytics/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "view", page: window.location.pathname + window.location.search })
+        }).catch(() => {});
+    } catch (_) {}
+
+
     /* ── DOM refs ───────────────────────────────────────── */
     const posterImg        = $id("seriesPoster");
     const heroVideo        = $id("seriesHeroVideo");

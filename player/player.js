@@ -2158,6 +2158,15 @@ function applyPlayerData() {
 }
 
 async function prepareMultiPartPlayback() {
+    // Track video play event in analytics
+    try {
+        fetch("/api/analytics/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "play", page: "/player" })
+        }).catch(() => {});
+    } catch (_) {}
+
     partCount = playerData.parts || 1;
     isMultiPart = partCount > 1;
     currentPartIndex = 0;

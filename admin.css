@@ -650,3 +650,11 @@ code { padding: 2px 5px; border-radius: 4px; background: rgba(255,255,255,.09); 
     height: 85px;
   }
 }
+
+.stat-chip-highlight {
+  background: rgba(255, 23, 68, 0.08);
+  border-color: rgba(255, 23, 68, 0.35);
+}
+.stat-chip-highlight .stat-num {
+  color: var(--red);
+}

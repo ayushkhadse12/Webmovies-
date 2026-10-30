@@ -39,6 +39,7 @@ const TMDB_BEARER = process.env.TMDB_BEARER_TOKEN || ENV.TMDB_BEARER_TOKEN || ""
    CATALOG HELPERS
 ========================================================= */
 const CATALOG_PATH = path.join(__dirname, "data", "catalog.json");
+const ANALYTICS_PATH = path.join(__dirname, "data", "analytics.json");
 const UPLOADS_DIR = path.join(__dirname, "data", "uploads");
 
 // Optional Cloud Database: MongoDB Atlas
@@ -137,6 +138,96 @@ async function writeCatalog(catalog) {
   // Local fallback
   await fsPromises.mkdir(path.dirname(CATALOG_PATH), { recursive: true });
   await fsPromises.writeFile(CATALOG_PATH, JSON.stringify(catalog, null, 2), "utf8");
+}
+
+function getTodayKey() {
+  const now = new Date();
+  return now.toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+}
+
+async function recordEvent(type, page = "/") {
+  const today = getTodayKey();
+  const db = await getMongoDb();
+  if (db) {
+    try {
+      const incFields = { total: 1 };
+      incFields[`days.${today}`] = 1;
+      if (type === "play") {
+        incFields.plays = 1;
+        incFields[`playDays.${today}`] = 1;
+      }
+      await db.collection("analytics").updateOne(
+        { _id: "stats" },
+        {
+          $inc: incFields,
+          $set: { lastUpdated: new Date() }
+        },
+        { upsert: true }
+      );
+      return;
+    } catch (e) {
+      console.warn("[Analytics] MongoDB update error:", e.message);
+    }
+  }
+
+  // Fallback to local data/analytics.json
+  try {
+    let local = { total: 0, plays: 0, days: {}, playDays: {} };
+    try {
+      const raw = await fsPromises.readFile(ANALYTICS_PATH, "utf8");
+      local = JSON.parse(raw);
+    } catch (_) {}
+
+    local.total = (local.total || 0) + 1;
+    if (!local.days) local.days = {};
+    local.days[today] = (local.days[today] || 0) + 1;
+
+    if (type === "play") {
+      local.plays = (local.plays || 0) + 1;
+      if (!local.playDays) local.playDays = {};
+      local.playDays[today] = (local.playDays[today] || 0) + 1;
+    }
+
+    local.lastUpdated = new Date().toISOString();
+    await fsPromises.mkdir(path.dirname(ANALYTICS_PATH), { recursive: true });
+    await fsPromises.writeFile(ANALYTICS_PATH, JSON.stringify(local, null, 2), "utf8");
+  } catch (err) {
+    console.warn("[Analytics] Local fallback error:", err.message);
+  }
+}
+
+async function getAnalyticsStats() {
+  const today = getTodayKey();
+  const db = await getMongoDb();
+  if (db) {
+    try {
+      const doc = await db.collection("analytics").findOne({ _id: "stats" });
+      if (doc) {
+        return {
+          totalViews: doc.total || 0,
+          todayViews: (doc.days && doc.days[today]) || 0,
+          totalPlays: doc.plays || 0,
+          todayPlays: (doc.playDays && doc.playDays[today]) || 0
+        };
+      }
+    } catch (e) {
+      console.warn("[Analytics] MongoDB read error:", e.message);
+    }
+  }
+
+  // Local fallback
+  try {
+    const raw = await fsPromises.readFile(ANALYTICS_PATH, "utf8");
+    const doc = JSON.parse(raw);
+    return {
+      totalViews: doc.total || 0,
+      todayViews: (doc.days && doc.days[today]) || 0,
+      totalPlays: doc.plays || 0,
+      todayPlays: (doc.playDays && doc.playDays[today]) || 0
+    };
+  } catch {
+    return { totalViews: 0, todayViews: 0, totalPlays: 0, todayPlays: 0 };
+  }
 }
 
 function formatStreamUrl(input) {
@@ -292,6 +383,26 @@ async function handleRequest(req, res) {
       uriPresent: Boolean(currentUri),
       error: lastMongoError
     });
+  }
+
+  // --- POST /api/analytics/track ---
+  if (pathname === "/api/analytics/track" && method === "POST") {
+    try {
+      const body = await parseBody(req);
+      const type = (body && body.type) === "play" ? "play" : "view";
+      const page = (body && body.page) || "/";
+      await recordEvent(type, page);
+      return sendJson(res, 200, { ok: true });
+    } catch (err) {
+      return sendJson(res, 200, { ok: false });
+    }
+  }
+
+  // --- GET /api/admin/analytics ---
+  if (pathname === "/api/admin/analytics" && method === "GET") {
+    if (!requireAdmin(req, res)) return;
+    const stats = await getAnalyticsStats();
+    return sendJson(res, 200, stats);
   }
 
   // --- GET /api/catalog ---

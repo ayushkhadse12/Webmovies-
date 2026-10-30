@@ -161,6 +161,7 @@ async function loadManageCatalog() {
         // Populate Series Page Manager dropdown
         populateSeriesCustomizer(catalog);
         checkDatabaseStatus();
+        loadAnalyticsStats();
 
         // Filter lists
         const moviesList = items.filter(i => i.kind === "movie" || i.kind === "Movie" || (!i.kind && i.type === "Movie"));
@@ -1229,5 +1230,25 @@ async function checkDatabaseStatus() {
         }
     } catch (e) {
         console.warn("Could not check db status", e);
+    }
+}
+
+async function loadAnalyticsStats() {
+    try {
+        const token = window._adminToken || sessionStorage.getItem("webmovies-admin-token") || "";
+        const res = await fetch("/api/admin/analytics", {
+            headers: token ? { "X-Admin-Token": token } : {}
+        });
+        if (!res.ok) return;
+        const stats = await res.json();
+        const statTodayViews = document.getElementById("statTodayViews");
+        const statTotalViews = document.getElementById("statTotalViews");
+        const statTotalPlays = document.getElementById("statTotalPlays");
+
+        if (statTodayViews) statTodayViews.textContent = (stats.todayViews || 0).toLocaleString();
+        if (statTotalViews) statTotalViews.textContent = (stats.totalViews || 0).toLocaleString();
+        if (statTotalPlays) statTotalPlays.textContent = (stats.totalPlays || 0).toLocaleString();
+    } catch (e) {
+        console.warn("Could not load analytics stats:", e);
     }
 }
