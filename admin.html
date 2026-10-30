@@ -68,14 +68,80 @@
         <div id="dbStatusBar" style="display:none; margin:0 0 20px 0; padding:14px 18px; border-radius:12px; font-size:0.95rem; line-height:1.5;"></div>
 
         <!-- Stats row -->
-        <div class="stats-row" id="statsRow">
-          <div class="stat-chip"><span class="stat-num" id="statMovies">—</span><span class="stat-label">Movies</span></div>
-          <div class="stat-chip"><span class="stat-num" id="statSeries">—</span><span class="stat-label">Series</span></div>
-          <div class="stat-chip"><span class="stat-num" id="statCS">—</span><span class="stat-label">Coming Soon</span></div>
-          <div class="stat-chip"><span class="stat-num" id="statHero">—</span><span class="stat-label">Hero Posters</span></div>
-          <div class="stat-chip stat-chip-highlight"><span class="stat-num" id="statTodayViews">0</span><span class="stat-label">Today Views</span></div>
-          <div class="stat-chip"><span class="stat-num" id="statTotalViews">0</span><span class="stat-label">All-Time Views</span></div>
-          <div class="stat-chip"><span class="stat-num" id="statTotalPlays">0</span><span class="stat-label">Video Plays</span></div>
+        <!-- Premium Stats Grid -->
+        <div class="stats-grid" id="statsRow">
+          <div class="stat-card stat-card-live">
+            <div class="stat-icon-wrap" style="--accent: #ff1744;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Today Views</span>
+              <div class="stat-val-row">
+                <span class="stat-num" id="statTodayViews">0</span>
+                <span class="live-dot" title="Live 24h Activity"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap" style="--accent: #00e676;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">All-Time Views</span>
+              <span class="stat-num" id="statTotalViews">0</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap" style="--accent: #ff9100;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Video Plays</span>
+              <span class="stat-num" id="statTotalPlays">0</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap" style="--accent: #2979ff;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Movies</span>
+              <span class="stat-num" id="statMovies">—</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap" style="--accent: #d500f9;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Web Series</span>
+              <span class="stat-num" id="statSeries">—</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap" style="--accent: #ffab00;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Coming Soon</span>
+              <span class="stat-num" id="statCS">—</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap" style="--accent: #00b0ff;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Hero Posters</span>
+              <span class="stat-num" id="statHero">—</span>
+            </div>
+          </div>
         </div>
 
         <!-- Section Cards Grid -->
