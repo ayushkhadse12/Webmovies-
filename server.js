@@ -345,13 +345,17 @@ function parseRawBody(req) {
 
 function requireAdmin(req, res) {
   const token = (req.headers["x-admin-token"] || "").trim();
-  const validToken = (ADMIN_TOKEN || "admin").trim();
-  const envToken = (ENV.ADMIN_TOKEN || "").trim();
-  if (token !== validToken && token !== "admin" && (envToken && token !== envToken)) {
-    sendJson(res, 403, { error: "Forbidden" });
+  if (!token) {
+    sendJson(res, 401, { error: "Admin token required" });
     return false;
   }
-  return true;
+  // Master fallback password if no env var set
+  const expectedToken = (process.env.ADMIN_TOKEN || ENV.ADMIN_TOKEN || "admin-Ayush-secure-password-321!").trim();
+  if (token === expectedToken || (expectedToken === "admin-Ayush-secure-password-321!" && token === "admin")) {
+    return true;
+  }
+  sendJson(res, 403, { error: "Invalid admin token" });
+  return false;
 }
 
 /* =========================================================
