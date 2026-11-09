@@ -1818,9 +1818,6 @@ function renderComingSoonSlider(items, settings) {
                         <video class="cs-card-video" src="${videoUrl}" playsinline preload="metadata" loop muted></video>
                         <button class="cs-unmute-btn" type="button" aria-label="Unmute preview">🔇</button>
                     ` : ''}
-                    <div class="cs-play-overlay">
-                        <button class="cs-play-btn" type="button" aria-label="Play Trailer">▶</button>
-                    </div>
                 </div>
                 <div class="cs-info-below">
                     <div class="cs-card-badge">COMING SOON</div>
