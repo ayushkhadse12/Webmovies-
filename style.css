@@ -2372,10 +2372,10 @@ HERO ARROWS
   will-change: transform;
 }
 
-/* Each card — increased size */
+/* Each card — enlarged for cinematic trailer view */
 .cs-card {
   position: relative;
-  flex: 0 0 clamp(220px, 24vw, 320px);
+  flex: 0 0 clamp(260px, 26vw, 360px);
   aspect-ratio: 2 / 3;
   border-radius: var(--radius);
   overflow: hidden;
@@ -2391,38 +2391,57 @@ HERO ARROWS
 
 /* Coming Soon dynamic card sizes managed by Admin settings */
 .coming-soon-section.cs-size-small .cs-card {
-  flex: 0 0 190px !important;
-  max-width: 190px !important;
+  flex: 0 0 220px !important;
+  max-width: 220px !important;
 }
 .coming-soon-section.cs-size-medium .cs-card {
-  flex: 0 0 260px !important;
-  max-width: 260px !important;
+  flex: 0 0 300px !important;
+  max-width: 300px !important;
 }
 .coming-soon-section.cs-size-large .cs-card {
-  flex: 0 0 340px !important;
-  max-width: 340px !important;
+  flex: 0 0 380px !important;
+  max-width: 380px !important;
 }
 .coming-soon-section.cs-size-xlarge .cs-card {
-  flex: 0 0 420px !important;
-  max-width: 420px !important;
+  flex: 0 0 460px !important;
+  max-width: 460px !important;
 }
 
 @media (max-width: 768px) {
+  .coming-soon-section.cs-size-small .cs-card {
+    flex: 0 0 185px !important;
+    max-width: 185px !important;
+  }
+  .coming-soon-section.cs-size-medium .cs-card {
+    flex: 0 0 245px !important;
+    max-width: 245px !important;
+  }
+  .coming-soon-section.cs-size-large .cs-card {
+    flex: 0 0 310px !important;
+    max-width: 310px !important;
+  }
+  .coming-soon-section.cs-size-xlarge .cs-card {
+    flex: 0 0 380px !important;
+    max-width: 380px !important;
+  }
+}
+
+@media (max-width: 480px) {
   .coming-soon-section.cs-size-small .cs-card {
     flex: 0 0 160px !important;
     max-width: 160px !important;
   }
   .coming-soon-section.cs-size-medium .cs-card {
-    flex: 0 0 220px !important;
-    max-width: 220px !important;
+    flex: 0 0 215px !important;
+    max-width: 215px !important;
   }
   .coming-soon-section.cs-size-large .cs-card {
-    flex: 0 0 280px !important;
-    max-width: 280px !important;
+    flex: 0 0 270px !important;
+    max-width: 270px !important;
   }
   .coming-soon-section.cs-size-xlarge .cs-card {
-    flex: 0 0 350px !important;
-    max-width: 350px !important;
+    flex: 0 0 325px !important;
+    max-width: 325px !important;
   }
 }
 
