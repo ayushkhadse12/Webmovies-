@@ -58,7 +58,7 @@ loginForm.addEventListener("submit", async event => {
 
     const token = loginToken.value.trim();
     if (!token) {
-        showLoginError("Please enter your admin token.");
+        showLoginError("Please enter an access token.");
         return;
     }
 
@@ -70,7 +70,7 @@ loginForm.addEventListener("submit", async event => {
     try {
         const valid = await verifyToken(token);
         if (!valid) {
-            throw new Error("Invalid token. Please check your ADMIN_TOKEN in the .env file.");
+            throw new Error("Access denied. Invalid credentials provided.");
         }
 
         sessionStorage.setItem("webmovies-admin-token", token);
@@ -78,7 +78,7 @@ loginForm.addEventListener("submit", async event => {
 
     } catch (err) {
         if (err instanceof TypeError || err.message.includes("Failed to fetch")) {
-            showLoginError("Cannot reach the server. Start it with: node server.js");
+            showLoginError("Service temporarily unavailable. Please try again later.");
         } else {
             showLoginError(err.message);
         }
