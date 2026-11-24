@@ -284,6 +284,12 @@
                 <input id="localFile" type="file" accept="video/*,audio/*" />
               </label>
               <p id="localFileHelp" class="field-help" hidden>The selected file is uploaded to this WebMovies server and can then be streamed by users.</p>
+              <label style="margin-top:14px;">Audio Languages <span>(optional, e.g. Hindi, Marathi)</span>
+                <input id="audioTracksInput" type="text" placeholder="Hindi, Marathi" />
+              </label>
+              <label style="margin-top:14px;">Subtitle URL <span>(optional, .vtt or .srt URL)</span>
+                <input id="subtitleTracksInput" type="url" placeholder="https://example.com/subtitles.vtt" />
+              </label>
             </div>
 
             <div id="seriesMediaFields" hidden>

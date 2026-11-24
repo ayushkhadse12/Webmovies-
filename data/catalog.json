@@ -200,7 +200,24 @@
         "provider": "local",
         "filename": "video-1788699691744-0-7819019242445151.mkv"
       },
-      "showOnHome": true
+      "showOnHome": true,
+      "audioTracks": [
+        {
+          "id": "audio-0",
+          "name": "Hindi",
+          "language": "hin",
+          "streamIndex": 1,
+          "isDefault": true
+        }
+      ],
+      "subtitleTracks": [
+        {
+          "id": "sub-0",
+          "name": "UND",
+          "language": "und",
+          "url": "/data/uploads/hanuman-ansh_sub_0_und.vtt"
+        }
+      ]
     },
     {
       "id": "dhamaal-4",
@@ -213,11 +230,37 @@
       "backdrop": "https://image.tmdb.org/t/p/w1280/95sjD0dRajtU6SKD6Gq6PtrGoGY.jpg",
       "duration": "",
       "media": {
-        "provider": "direct",
-        "streamUrl": "https://archive.org/download/dhamaal-4.mp4/Dhamaal%204%20%282026%29%20Bollywood%20Hindi%28DDP5.1-640Kbps%29%20Movie%20HD%201080p%20NF%20WEB-DL%20ESub.mp4",
-        "downloadUrl": "https://archive.org/download/dhamaal-4.mp4/Dhamaal%204%20%282026%29%20Bollywood%20Hindi%28DDP5.1-640Kbps%29%20Movie%20HD%201080p%20NF%20WEB-DL%20ESub.mp4"
+        "provider": "local",
+        "filename": "2d701a88-92a1-4bbb-8626-e925ddc52c59_Dhamaal_4__2026__Bollywood_Hindi_DDP5.1-640Kbps__Movie_HD_1080p_NF_WEB-DL_ESub.mkv",
+        "streamUrl": "/data/uploads/2d701a88-92a1-4bbb-8626-e925ddc52c59_Dhamaal_4__2026__Bollywood_Hindi_DDP5.1-640Kbps__Movie_HD_1080p_NF_WEB-DL_ESub.mkv",
+        "downloadUrl": "/data/uploads/2d701a88-92a1-4bbb-8626-e925ddc52c59_Dhamaal_4__2026__Bollywood_Hindi_DDP5.1-640Kbps__Movie_HD_1080p_NF_WEB-DL_ESub.mkv"
       },
-      "showOnHome": true
+      "showOnHome": true,
+      "audioTracks": [
+        {
+          "id": "audio-0",
+          "name": "Hindi(DDP5.1-640Kbps)",
+          "language": "hin",
+          "streamIndex": 1,
+          "isDefault": true
+        },
+        {
+          "id": "audio-1",
+          "name": "Hindi(HE-AAC5.1-224Kbps)",
+          "language": "hin",
+          "streamIndex": 2,
+          "isDefault": false,
+          "url": "/data/uploads/dhamaal_audio_1.m4a"
+        }
+      ],
+      "subtitleTracks": [
+        {
+          "id": "sub-0",
+          "name": "English",
+          "language": "eng",
+          "url": "/data/uploads/dhamaal-4_sub_0_eng.vtt"
+        }
+      ]
     }
   ],
   "comingSoon": [

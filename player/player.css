@@ -230,6 +230,24 @@ body {
     object-fit: contain;
 }
 
+.video-container.video-size-ultrawide {
+    aspect-ratio: 21 / 9;
+}
+
+.video-container.video-size-ultrawide .video-player {
+    object-fit: contain;
+}
+
+.video-container.video-size-compact .video-player {
+    object-fit: contain;
+    transform: scale(0.82);
+    transition: transform 0.2s ease;
+}
+
+.video-container.video-size-stretch .video-player {
+    object-fit: fill;
+}
+
 
 /* =========================================================
    POSTER
@@ -1042,9 +1060,17 @@ body {
         gap: 4px;
     }
 
+    .volume-slider {
+        display: none !important;
+    }
+
+    .volume-container {
+        margin-right: 2px !important;
+    }
+
     .controls-left,
     .controls-right {
-        gap: 1px;
+        gap: 2px;
     }
 
     .control-button {
@@ -1132,21 +1158,99 @@ body {
         font-size: 14px;
     }
 
-    #audioButton,
-    #subtitleButton {
-        display: none;
+    .volume-container {
+        display: none !important;
     }
 
     .control-button {
-        min-width: 31px;
-
-        font-size: 12px;
+        min-width: 28px;
+        padding: 0 2px;
+        font-size: 11px;
     }
 
     .time-display {
-        font-size: 9px;
+        font-size: 8.5px;
+        letter-spacing: -0.3px;
     }
 
+}
+
+/* =========================================================
+   MOBILE TOUCH & FULLSCREEN IMPROVEMENTS
+========================================================= */
+
+@media (hover: none) and (pointer: coarse) {
+    .control-button {
+        min-width: 36px;
+        min-height: 36px;
+        font-size: 14px;
+    }
+
+    .player-popup {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+
+    .selection-item {
+        min-height: 44px;
+        padding: 10px 14px;
+    }
+
+    .progress-bar {
+        height: 6px;
+    }
+
+    .progress-bar::-webkit-slider-thumb {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* Mobile landscape theater mode */
+@media (max-width: 900px) and (orientation: landscape) {
+    .video-container {
+        height: 100vh !important;
+        aspect-ratio: unset !important;
+    }
+
+    .video-information {
+        display: none !important;
+    }
+}
+
+/* Double-tap ripple effect */
+.seek-ripple {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 15;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.seek-ripple.left {
+    left: 0;
+    background: radial-gradient(circle at left center, rgba(255,255,255,0.18), transparent 70%);
+}
+
+.seek-ripple.right {
+    right: 0;
+    background: radial-gradient(circle at right center, rgba(255,255,255,0.18), transparent 70%);
+}
+
+.seek-ripple-badge {
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 /* =====================================================

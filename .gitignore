@@ -4,11 +4,14 @@ node_modules/
 # Environment secrets (NEVER push this)
 .env
 
-# Uploaded videos (too large for GitHub — host separately)
+# Uploaded videos and audio (too large for GitHub — host separately)
 data/uploads/*.mp4
 data/uploads/*.mkv
 data/uploads/*.avi
 data/uploads/*.webm
+data/uploads/*.m4a
+data/uploads/*.aac
+data/uploads/*.mp3
 assets/clips/*.mp4
 assets/clips/*.mkv
 

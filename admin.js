@@ -517,6 +517,8 @@ async function uploadLocalMovie() {
     const uploadId = crypto.randomUUID();
     let uploadedBytes = 0;
     let completedMedia = null;
+    let completedAudioTracks = [];
+    let completedSubtitleTracks = [];
 
     for (let offset = 0; offset < file.size; offset += chunkSize) {
         const chunk = file.slice(offset, Math.min(offset + chunkSize, file.size));
@@ -540,11 +542,17 @@ async function uploadLocalMovie() {
         if (!response.ok) throw new Error(result.error || "The video upload failed.");
         uploadedBytes = result.received || uploadedBytes + chunk.size;
         completedMedia = result.media || completedMedia;
+        if (result.audioTracks) completedAudioTracks = result.audioTracks;
+        if (result.subtitleTracks) completedSubtitleTracks = result.subtitleTracks;
     }
 
     setMessage(`Uploading "${file.name}"... 100%`);
     if (!completedMedia) throw new Error("The upload did not finish correctly.");
-    return completedMedia;
+    return {
+        media: completedMedia,
+        audioTracks: completedAudioTracks,
+        subtitleTracks: completedSubtitleTracks
+    };
 }
 
 function getEpisodeMedia() {
@@ -647,15 +655,22 @@ importForm.addEventListener("submit", async event => {
 
         const kind = mediaKind.value;
         const tmdbId = document.getElementById("tmdbId").value.trim();
-        const uploadedMedia = kind === "movie" && mediaProvider.value === "local"
+        const uploadResult = kind === "movie" && mediaProvider.value === "local"
             ? await uploadLocalMovie()
             : null;
+        const uploadedMedia = uploadResult ? (uploadResult.media || uploadResult) : null;
+        const manualAudioTracks = (document.getElementById("audioTracksInput")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
+        const manualSubtitleTracks = (document.getElementById("subtitleTracksInput")?.value || "").trim() ? [{ name: "Subtitles", url: document.getElementById("subtitleTracksInput").value.trim() }] : [];
+        const autoAudio = (uploadResult && uploadResult.audioTracks) || [];
+        const autoSubs = (uploadResult && uploadResult.subtitleTracks) || [];
         const payload = {
             kind,
             title: document.getElementById("title").value.trim(),
             tmdbId: tmdbId ? Number(tmdbId) : undefined,
             customPoster: document.getElementById("customPoster")?.value.trim() || "",
             media: uploadedMedia || (kind === "movie" ? getMovieMedia() : {}),
+            audioTracks: manualAudioTracks.length > 0 ? manualAudioTracks : autoAudio,
+            subtitleTracks: manualSubtitleTracks.length > 0 ? manualSubtitleTracks : autoSubs,
             episodeMedia: kind === "series" ? getEpisodeMedia() : {}
         };
 

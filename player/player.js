@@ -1256,24 +1256,88 @@ function hideControls() {
 videoContainer.addEventListener(
     "mousemove",
     function () {
-
         showControls();
-
     }
 );
 
+// Mobile touch gestures: tap to toggle controls, double tap to seek 10s
+let lastTapTime = 0;
+let lastTapX = 0;
+let tapTimeout = null;
 
-videoContainer.addEventListener(
-    "touchstart",
-    function () {
+function showSeekRipple(direction, seconds) {
+    const existing = videoContainer.querySelectorAll(".seek-ripple");
+    existing.forEach(el => el.remove());
 
-        showControls();
+    const ripple = document.createElement("div");
+    ripple.className = "seek-ripple " + direction;
+    const badge = document.createElement("div");
+    badge.className = "seek-ripple-badge";
+    badge.textContent = direction === "left" ? `↶ ${seconds}s` : `${seconds}s ↷`;
+    ripple.appendChild(badge);
+    videoContainer.appendChild(ripple);
 
-    },
-    {
-        passive: true
+    requestAnimationFrame(() => {
+        ripple.style.opacity = "1";
+        setTimeout(() => {
+            ripple.style.opacity = "0";
+            setTimeout(() => ripple.remove(), 250);
+        }, 550);
+    });
+}
+
+videoContainer.addEventListener("click", function (event) {
+    // If click was inside controls or popups, don't toggle video controls
+    if (event.target.closest("#videoControls") || event.target.closest(".player-popup") || event.target.closest(".center-play-button")) {
+        return;
     }
-);
+
+    const now = Date.now();
+    const rect = videoContainer.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const isDoubleTap = (now - lastTapTime < 320) && (Math.abs(clickX - lastTapX) < 90);
+
+    if (isDoubleTap) {
+        clearTimeout(tapTimeout);
+        tapTimeout = null;
+        const isLeft = clickX < rect.width * 0.45;
+        const isRight = clickX > rect.width * 0.55;
+
+        if (isLeft) {
+            seekCombinedTime(getCombinedCurrentTime() - 10);
+            showSeekRipple("left", 10);
+        } else if (isRight) {
+            seekCombinedTime(getCombinedCurrentTime() + 10);
+            showSeekRipple("right", 10);
+        } else {
+            togglePlay();
+        }
+        showControls();
+    } else {
+        lastTapTime = now;
+        lastTapX = clickX;
+        tapTimeout = setTimeout(() => {
+            // Single tap: toggle controls visibility
+            const isHidden = videoContainer.classList.contains("controls-hidden");
+            if (isHidden) {
+                showControls();
+            } else {
+                hideControls();
+            }
+        }, 280);
+    }
+});
+
+// Prevent controls hiding while user drags the progress bar
+if (progressBar) {
+    progressBar.addEventListener("input", () => {
+        showControls();
+        clearTimeout(controlsTimeout);
+    });
+    progressBar.addEventListener("change", () => {
+        showControls();
+    });
+}
 
 
 /* =========================================================
@@ -1401,10 +1465,12 @@ if (closeQuality) {
 }
 
 const videoSizes = {
-    fit: { label: "Fit", className: "video-size-fit" },
-    fill: { label: "Fill", className: "video-size-fill" },
-    wide: { label: "Wide", className: "video-size-wide" },
-    classic: { label: "4:3", className: "video-size-classic" }
+    fit: { label: "Best Fit", className: "video-size-fit" },
+    fill: { label: "Fill Screen", className: "video-size-fill" },
+    wide: { label: "Wide 16:9", className: "video-size-wide" },
+    ultrawide: { label: "Ultrawide 21:9", className: "video-size-ultrawide" },
+    compact: { label: "Compact", className: "video-size-compact" },
+    stretch: { label: "Stretch", className: "video-size-stretch" }
 };
 
 function applyVideoSize(sizeName) {
@@ -1535,382 +1601,341 @@ qualityOption.addEventListener(
    AUDIO TRACKS
 ========================================================= */
 
-function renderAudioTracks() {
+function getAvailableAudioTracks() {
+    const list = [];
 
-    audioTracks.innerHTML = "";
-
-    const tracks =
-        Array.isArray(
-            playerData.audioTracks
-        )
-            ? playerData.audioTracks
-            : [];
-
-
-    if (!tracks.length) {
-
-        const button =
-            document.createElement("button");
-
-        button.type =
-            "button";
-
-        button.className =
-            "selection-item active";
-
-        button.innerHTML = `
-            <span>Original</span>
-            <span>✓</span>
-        `;
-
-        audioTracks.appendChild(
-            button
-        );
-
-        return;
-
+    // 1. From playerData.audioTracks
+    if (Array.isArray(playerData.audioTracks) && playerData.audioTracks.length > 0) {
+        playerData.audioTracks.forEach((t, i) => {
+            if (typeof t === "string") {
+                list.push({ name: t, language: t, id: String(i) });
+            } else if (t && typeof t === "object") {
+                list.push({
+                    name: t.name || t.label || t.language || ("Audio " + (i + 1)),
+                    language: t.language || "",
+                    url: t.url || t.src || "",
+                    id: String(i)
+                });
+            }
+        });
     }
 
-
-    tracks.forEach(
-        function (track, index) {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.type =
-                "button";
-
-            button.className =
-                "selection-item" +
-                (
-                    index === 0
-                        ? " active"
-                        : ""
-                );
-
-            const name =
-                typeof track === "string"
-                    ? track
-                    : track.name ||
-                    track.language ||
-                    `Audio ${index + 1}`;
-
-
-            button.innerHTML = `
-                <span>${escapeHtml(name)}</span>
-                <span>
-                    ${index === 0 ? "✓" : ""}
-                </span>
-            `;
-
-
-            button.addEventListener(
-                "click",
-                function () {
-
-                    selectAudioTrack(
-                        track,
-                        button
-                    );
-
-                }
-            );
-
-
-            audioTracks.appendChild(
-                button
-            );
-
+    // 2. From native HTML5 audioTracks (Safari, Edge, and supported browsers)
+    const targetPlayer = activePlayer || videoPlayer;
+    if (targetPlayer && targetPlayer.audioTracks && targetPlayer.audioTracks.length > 0) {
+        for (let i = 0; i < targetPlayer.audioTracks.length; i++) {
+            const at = targetPlayer.audioTracks[i];
+            const name = at.label || (at.language ? at.language.toUpperCase() : ("Audio Track " + (i + 1)));
+            if (!list.some(item => item.name === name)) {
+                list.push({
+                    name,
+                    language: at.language || "",
+                    nativeIndex: i,
+                    nativeTrack: at,
+                    id: "native-" + i
+                });
+            }
         }
-    );
+    }
 
+    // 3. If no tracks provided, return empty list (player auto-detects from server)
+    return list;
+
+    return list;
 }
 
+let currentAudioTrackId = null;
 
-function selectAudioTrack(
-    track,
-    button
-) {
+let externalAudioEl = null;
 
-    /*
-       This is intentionally prepared
-       for multiple audio tracks.
-
-       Browser video elements do not
-       automatically switch between
-       separate audio files.
-
-       Later we can connect this to
-       HLS/DASH or our backend player.
-    */
-
-    document
-        .querySelectorAll(
-            "#audioTracks .selection-item"
-        )
-        .forEach(
-            item =>
-                item.classList.remove(
-                    "active"
-                )
-        );
-
-    button.classList.add(
-        "active"
-    );
-
+function cleanupExternalAudio() {
+    if (externalAudioEl) {
+        if (externalAudioEl._syncInterval) clearInterval(externalAudioEl._syncInterval);
+        externalAudioEl.pause();
+        externalAudioEl.removeAttribute("src");
+        externalAudioEl.load();
+        externalAudioEl = null;
+    }
 }
 
+function syncExternalAudio() {
+    const target = activePlayer || videoPlayer;
+    if (externalAudioEl && target) {
+        if (Math.abs(externalAudioEl.currentTime - target.currentTime) > 0.3) {
+            externalAudioEl.currentTime = target.currentTime;
+        }
+    }
+}
+
+function renderAudioTracks() {
+    if (!audioTracks) return;
+    audioTracks.innerHTML = "";
+
+    const tracks = getAvailableAudioTracks();
+
+    // Show audio button if tracks exist (keep button accessible on mobile)
+    if (audioButton) {
+        audioButton.style.display = tracks.length > 1 ? "flex" : (tracks.length === 1 ? "flex" : "none");
+    }
+
+    if (!currentAudioTrackId && tracks.length > 0) {
+        currentAudioTrackId = tracks[0].id;
+    }
+
+    tracks.forEach(function (track, index) {
+        const button = document.createElement("button");
+        button.type = "button";
+        const isActive = currentAudioTrackId ? (track.id === currentAudioTrackId) : (index === 0);
+        button.className = "selection-item" + (isActive ? " active" : "");
+
+        button.innerHTML = `
+            <span>${escapeHtml(track.name)}</span>
+            <span>${isActive ? "✓" : ""}</span>
+        `;
+
+        button.addEventListener("click", function () {
+            selectAudioTrack(track, button);
+        });
+
+        audioTracks.appendChild(button);
+    });
+}
+
+function selectAudioTrack(track, button) {
+    currentAudioTrackId = track.id;
+    const targetPlayer = activePlayer || videoPlayer;
+
+    // Clean up any previously attached external audio
+    cleanupExternalAudio();
+
+    // 1. If native audioTracks supported (Safari / modern WebKit)
+    if (targetPlayer && targetPlayer.audioTracks && targetPlayer.audioTracks.length > 0) {
+        targetPlayer.muted = false;
+        const targetIndex = track.nativeIndex !== undefined ? track.nativeIndex : (track.streamIndex !== undefined ? track.streamIndex : 0);
+        for (let i = 0; i < targetPlayer.audioTracks.length; i++) {
+            targetPlayer.audioTracks[i].enabled = (i === targetIndex);
+        }
+    } else if (track.url && targetPlayer) {
+        // 2. External audio stream sync
+        targetPlayer.muted = true;
+        externalAudioEl = new Audio(track.url);
+        externalAudioEl.currentTime = targetPlayer.currentTime;
+        externalAudioEl.volume = targetPlayer.volume || 1;
+        if (!targetPlayer.paused) {
+            externalAudioEl.play().catch(() => {});
+        }
+        targetPlayer.addEventListener("seeked", syncExternalAudio);
+        targetPlayer.addEventListener("play", function () {
+            if (externalAudioEl) {
+                externalAudioEl.currentTime = targetPlayer.currentTime;
+                externalAudioEl.play().catch(() => {});
+            }
+        });
+        targetPlayer.addEventListener("pause", function () {
+            if (externalAudioEl) externalAudioEl.pause();
+        });
+        targetPlayer.addEventListener("ratechange", function () {
+            if (externalAudioEl) externalAudioEl.playbackRate = targetPlayer.playbackRate;
+        });
+        externalAudioEl._syncInterval = setInterval(syncExternalAudio, 2500);
+    } else {
+        // Default track
+        if (targetPlayer) targetPlayer.muted = false;
+    }
+
+    // Update UI active state
+    document.querySelectorAll("#audioTracks .selection-item").forEach(item => {
+        item.classList.remove("active");
+        const chk = item.querySelector("span:last-child");
+        if (chk) chk.textContent = "";
+    });
+
+    button.classList.add("active");
+    const check = button.querySelector("span:last-child");
+    if (check) check.textContent = "✓";
+
+    showPlayerToast("Audio: " + track.name);
+}
 
 /* =========================================================
    SUBTITLE TRACKS
 ========================================================= */
 
-function renderSubtitleTracks() {
+function getAvailableSubtitleTracks() {
+    const list = [];
 
+    // 1. From playerData.subtitleTracks
+    if (Array.isArray(playerData.subtitleTracks) && playerData.subtitleTracks.length > 0) {
+        playerData.subtitleTracks.forEach((t, i) => {
+            if (typeof t === "string") {
+                list.push({ name: t, url: t, id: String(i) });
+            } else if (t && typeof t === "object") {
+                list.push({
+                    name: t.name || t.label || t.language || ("Subtitle " + (i + 1)),
+                    language: t.language || "",
+                    url: t.url || t.src || "",
+                    id: String(i)
+                });
+            }
+        });
+    }
+
+    // 2. From embedded textTracks in video player
+    const targetPlayer = activePlayer || videoPlayer;
+    if (targetPlayer && targetPlayer.textTracks && targetPlayer.textTracks.length > 0) {
+        for (let i = 0; i < targetPlayer.textTracks.length; i++) {
+            const tt = targetPlayer.textTracks[i];
+            const name = tt.label || (tt.language ? tt.language.toUpperCase() : ("Embedded Subtitle " + (i + 1)));
+            if (!list.some(item => item.name === name)) {
+                list.push({
+                    name,
+                    language: tt.language || "",
+                    nativeIndex: i,
+                    id: "textTrack-" + i
+                });
+            }
+        }
+    }
+
+    // 3. Only return real detected/provided tracks
+    return list;
+
+    return list;
+}
+
+let currentSubtitleId = "off";
+
+function renderSubtitleTracks() {
+    if (!subtitleTracks) return;
     subtitleTracks.innerHTML = "";
 
-    const offButton =
-        document.createElement(
-            "button"
-        );
+    const tracks = getAvailableSubtitleTracks();
 
-    offButton.type =
-        "button";
+    // Show/hide subtitle button based on whether subtitles exist
+    if (subtitleButton) {
+        subtitleButton.style.display = tracks.length > 0 ? "flex" : "none";
+    }
 
-    offButton.className =
-        "selection-item active";
+    const isOffActive = (currentSubtitleId === "off");
 
+    const offButton = document.createElement("button");
+    offButton.type = "button";
+    offButton.className = "selection-item" + (isOffActive ? " active" : "");
     offButton.innerHTML = `
         <span>Off</span>
-        <span>✓</span>
+        <span>${isOffActive ? "✓" : ""}</span>
     `;
 
+    offButton.addEventListener("click", function () {
+        disableSubtitles();
+        setActiveSubtitleButton(offButton);
+    });
 
-    offButton.addEventListener(
-        "click",
-        function () {
+    subtitleTracks.appendChild(offButton);
 
-            disableSubtitles();
+    tracks.forEach(function (track) {
+        const button = document.createElement("button");
+        button.type = "button";
+        const isActive = (currentSubtitleId === track.id);
+        button.className = "selection-item" + (isActive ? " active" : "");
 
-            setActiveSubtitleButton(
-                offButton
-            );
+        button.innerHTML = `
+            <span>${escapeHtml(track.name)}</span>
+            <span>${isActive ? "✓" : ""}</span>
+        `;
 
-        }
-    );
+        button.addEventListener("click", function () {
+            selectSubtitleTrack(track, button);
+        });
 
-
-    subtitleTracks.appendChild(
-        offButton
-    );
-
-
-    const tracks =
-        Array.isArray(
-            playerData.subtitleTracks
-        )
-            ? playerData.subtitleTracks
-            : [];
-
-
-    tracks.forEach(
-        function (track, index) {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.type =
-                "button";
-
-            button.className =
-                "selection-item";
-
-
-            const name =
-                typeof track === "string"
-                    ? track
-                    : track.name ||
-                    track.language ||
-                    `Subtitle ${index + 1}`;
-
-
-            button.innerHTML = `
-                <span>${escapeHtml(name)}</span>
-                <span></span>
-            `;
-
-
-            button.addEventListener(
-                "click",
-                function () {
-
-                    selectSubtitleTrack(
-                        track,
-                        button
-                    );
-
-                }
-            );
-
-
-            subtitleTracks.appendChild(
-                button
-            );
-
-        }
-    );
-
+        subtitleTracks.appendChild(button);
+    });
 }
 
+function selectSubtitleTrack(track, button) {
+    currentSubtitleId = track.id;
+    const targetPlayer = activePlayer || videoPlayer;
 
-function selectSubtitleTrack(
-    track,
-    button
-) {
+    if (targetPlayer) {
+        // 1. If native textTrack exists
+        if (track.nativeIndex !== undefined && targetPlayer.textTracks) {
+            for (let i = 0; i < targetPlayer.textTracks.length; i++) {
+                targetPlayer.textTracks[i].mode = (i === track.nativeIndex) ? "showing" : "hidden";
+            }
+        } else if (track.url) {
+            // 2. External subtitle file (.vtt or .srt)
+            const oldTracks = targetPlayer.querySelectorAll("track.custom-subtitle-track");
+            oldTracks.forEach(t => t.remove());
 
-    const trackUrl =
-        typeof track === "string"
-            ? track
-            : track.url;
+            const trackEl = document.createElement("track");
+            trackEl.className = "custom-subtitle-track";
+            trackEl.kind = "subtitles";
+            trackEl.label = track.name || "Subtitles";
+            trackEl.srclang = track.language || "en";
+            trackEl.src = track.url;
+            trackEl.default = true;
+            targetPlayer.appendChild(trackEl);
 
-
-    if (!trackUrl) {
-
-        return;
-
+            if (trackEl.track) {
+                trackEl.track.mode = "showing";
+            }
+        } else if (targetPlayer.textTracks && targetPlayer.textTracks.length > 0) {
+            // Try enabling first available text track
+            targetPlayer.textTracks[0].mode = "showing";
+        }
     }
 
-
-    const existingTracks =
-        videoPlayer.querySelectorAll(
-            "track"
-        );
-
-
-    existingTracks.forEach(
-        item => item.remove()
-    );
-
-
-    const subtitleTrack =
-        document.createElement(
-            "track"
-        );
-
-
-    subtitleTrack.kind =
-        "subtitles";
-
-    subtitleTrack.label =
-        typeof track === "string"
-            ? track
-            : (
-                track.name ||
-                track.language ||
-                "Subtitle"
-            );
-
-    subtitleTrack.src =
-        trackUrl;
-
-    subtitleTrack.default =
-        true;
-
-
-    videoPlayer.appendChild(
-        subtitleTrack
-    );
-
-
-    if (
-        subtitleTrack.track
-    ) {
-
-        subtitleTrack.track.mode =
-            "showing";
-
-    }
-
-
-    setActiveSubtitleButton(
-        button
-    );
-
+    setActiveSubtitleButton(button);
+    showPlayerToast("Subtitles: " + track.name);
 }
-
 
 function disableSubtitles() {
-
-    const tracks =
-        videoPlayer.textTracks;
-
-    for (
-        let i = 0;
-        i < tracks.length;
-        i++
-    ) {
-
-        tracks[i].mode =
-            "disabled";
-
+    currentSubtitleId = "off";
+    const targetPlayer = activePlayer || videoPlayer;
+    if (targetPlayer && targetPlayer.textTracks) {
+        for (let i = 0; i < targetPlayer.textTracks.length; i++) {
+            targetPlayer.textTracks[i].mode = "hidden";
+        }
     }
-
+    if (targetPlayer) {
+        const customTracks = targetPlayer.querySelectorAll("track.custom-subtitle-track");
+        customTracks.forEach(t => t.remove());
+    }
+    showPlayerToast("Subtitles: Off");
 }
 
+function setActiveSubtitleButton(activeButton) {
+    document.querySelectorAll("#subtitleTracks .selection-item").forEach(button => {
+        button.classList.remove("active");
+        const check = button.querySelector("span:last-child");
+        if (check) check.textContent = "";
+    });
 
-function setActiveSubtitleButton(
-    activeButton
-) {
-
-    document
-        .querySelectorAll(
-            "#subtitleTracks .selection-item"
-        )
-        .forEach(
-            button => {
-
-                button.classList.remove(
-                    "active"
-                );
-
-                const check =
-                    button.querySelector(
-                        "span:last-child"
-                    );
-
-                if (check) {
-                    check.textContent = "";
-                }
-
-            }
-        );
-
-
-    activeButton.classList.add(
-        "active"
-    );
-
-
-    const check =
-        activeButton.querySelector(
-            "span:last-child"
-        );
-
-    if (check) {
-
-        check.textContent =
-            "✓";
-
-    }
-
+    activeButton.classList.add("active");
+    const check = activeButton.querySelector("span:last-child");
+    if (check) check.textContent = "✓";
 }
 
+/* =========================================================
+   PLAYER TOAST NOTIFICATION
+========================================================= */
+
+function showPlayerToast(message) {
+    let toast = document.getElementById("playerToast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "playerToast";
+        toast.style.cssText = "position:absolute; top:24px; left:50%; transform:translateX(-50%); background:rgba(18,18,18,0.92); color:#fff; padding:8px 18px; border-radius:24px; font-size:13px; font-weight:600; letter-spacing:0.3px; border:1px solid rgba(255,255,255,0.18); box-shadow:0 4px 18px rgba(0,0,0,0.6); pointer-events:none; z-index:9999; transition:opacity 0.25s ease; opacity:0;";
+        const container = document.getElementById("videoContainer") || document.body;
+        container.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = "1";
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.style.opacity = "0";
+    }, 2200);
+}
 
 /* =========================================================
    DOWNLOAD
@@ -2178,17 +2203,25 @@ async function prepareMultiPartPlayback() {
 
     let videoUrl = playerData.video || "";
 
-    // If it is an /api/media/ URL, resolve actual media info from server
-    if (videoUrl.startsWith("/api/media/")) {
+    // Resolve media info and detected audio/subtitle tracks from server
+    const mediaQueryId = playerData.id || (videoUrl.startsWith("/api/media/") ? videoUrl.replace(/^\/api\/media\//, "").split("?")[0] : "");
+    if (mediaQueryId) {
         try {
-            const sep = videoUrl.includes("?") ? "&" : "?";
-            const infoRes = await fetch(`${videoUrl}${sep}info=1`);
+            const infoRes = await fetch(`/api/media/${encodeURIComponent(mediaQueryId)}?info=1`);
             if (infoRes.ok) {
                 const infoJson = await infoRes.json();
                 if (infoJson.media && infoJson.media.streamUrl) {
                     videoUrl = infoJson.media.streamUrl;
                     playerData.video = videoUrl;
                 }
+                if (Array.isArray(infoJson.audioTracks) && infoJson.audioTracks.length > 0) {
+                    playerData.audioTracks = infoJson.audioTracks;
+                }
+                if (Array.isArray(infoJson.subtitleTracks) && infoJson.subtitleTracks.length > 0) {
+                    playerData.subtitleTracks = infoJson.subtitleTracks;
+                }
+                renderAudioTracks();
+                renderSubtitleTracks();
             }
         } catch (e) {
             console.warn("Could not resolve media info:", e);
@@ -2290,6 +2323,8 @@ function setupVideoEvents(playerEl) {
         if (playerEl === activePlayer && !isMultiPart) {
             restorePlaybackPosition();
         }
+        renderAudioTracks();
+        renderSubtitleTracks();
     });
 }
 

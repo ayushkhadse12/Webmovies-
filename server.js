@@ -6,6 +6,7 @@ const http = require("http");
 const fs = require("fs");
 const fsPromises = require("fs").promises;
 const path = require("path");
+const { spawn } = require("child_process");
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
 const { generateToken, verifyToken } = require("./auth");
@@ -41,6 +42,155 @@ const TMDB_BEARER = process.env.TMDB_BEARER_TOKEN || ENV.TMDB_BEARER_TOKEN || ""
 const CATALOG_PATH = path.join(__dirname, "data", "catalog.json");
 const ANALYTICS_PATH = path.join(__dirname, "data", "analytics.json");
 const UPLOADS_DIR = path.join(__dirname, "data", "uploads");
+
+// FFmpeg path for probing media files and subtitle extraction
+let FFMPEG_PATH = "";
+try {
+  FFMPEG_PATH = require("@ffmpeg-installer/ffmpeg").path;
+} catch (e) {
+  console.warn("ffmpeg not available for media probing:", e.message);
+}
+
+/* =========================================================
+   MEDIA PROBE & EXTRACT (Auto-detect audio & subtitle tracks)
+========================================================= */
+
+const LANG_NAMES = {
+  hi: "Hindi", hin: "Hindi",
+  mr: "Marathi", mar: "Marathi",
+  en: "English", eng: "English",
+  ta: "Tamil", tam: "Tamil",
+  te: "Telugu", tel: "Telugu",
+  kn: "Kannada", kan: "Kannada",
+  ml: "Malayalam", mal: "Malayalam",
+  bn: "Bengali", ben: "Bengali",
+  gu: "Gujarati", guj: "Gujarati",
+  pa: "Punjabi", pan: "Punjabi",
+  ur: "Urdu", urd: "Urdu",
+  ja: "Japanese", jpn: "Japanese",
+  ko: "Korean", kor: "Korean",
+  zh: "Chinese", zho: "Chinese",
+  es: "Spanish", spa: "Spanish",
+  fr: "French", fra: "French",
+  de: "German", deu: "German",
+  ru: "Russian", rus: "Russian",
+  ar: "Arabic", ara: "Arabic",
+  pt: "Portuguese", por: "Portuguese",
+  it: "Italian", ita: "Italian",
+  und: "Unknown"
+};
+
+function langName(code) {
+  if (!code) return "";
+  return LANG_NAMES[code.toLowerCase()] || code.toUpperCase();
+}
+
+function probeMediaFile(filePath) {
+  return new Promise((resolve) => {
+    if (!FFMPEG_PATH || !fs.existsSync(filePath)) {
+      return resolve({ audioStreams: [], subtitleStreams: [] });
+    }
+    const proc = spawn(FFMPEG_PATH, ["-i", filePath], { stdio: ["pipe", "pipe", "pipe"] });
+    let stderr = "";
+    proc.stderr.on("data", (d) => (stderr += d.toString()));
+    proc.on("close", () => {
+      const audioStreams = [];
+      const subtitleStreams = [];
+      const lines = stderr.replace(/\r/g, "").split("\n");
+      let currentEntry = null;
+      for (const line of lines) {
+        const m = line.match(/Stream #\d+:(\d+)(?:\(([a-zA-Z0-9_-]+)\))?[^:]*:\s+(Audio|Subtitle):\s+(.+)/i);
+        if (m) {
+          currentEntry = {
+            index: parseInt(m[1], 10),
+            lang: (m[2] || "").toLowerCase(),
+            type: m[3],
+            info: m[4].trim(),
+            title: ""
+          };
+          if (m[3] === "Audio") audioStreams.push(currentEntry);
+          else if (m[3] === "Subtitle") subtitleStreams.push(currentEntry);
+        } else if (currentEntry && /^\s+title\s+:\s+/i.test(line)) {
+          const tMatch = line.match(/title\s*:\s*(.+)/i);
+          if (tMatch) currentEntry.title = tMatch[1].trim();
+        } else if (/^\s*Stream\s+#/.test(line)) {
+          currentEntry = null;
+        }
+      }
+      resolve({ audioStreams, subtitleStreams });
+    });
+    proc.on("error", () => resolve({ audioStreams: [], subtitleStreams: [] }));
+  });
+}
+
+function extractSubtitleFiles(filePath, baseName) {
+  return new Promise(async (resolve) => {
+    const probe = await probeMediaFile(filePath);
+    if (!probe.subtitleStreams || probe.subtitleStreams.length === 0) return resolve([]);
+    const results = [];
+    for (let i = 0; i < probe.subtitleStreams.length; i++) {
+      const sub = probe.subtitleStreams[i];
+      const lang = sub.lang || "und";
+      const cleanLabel = sub.title || langName(lang) || ("Subtitle " + (i + 1));
+      const vttFilename = `${baseName}_sub_${i}_${lang}.vtt`.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const vttPath = path.join(UPLOADS_DIR, vttFilename);
+
+      try {
+        if (!fs.existsSync(vttPath) || fs.statSync(vttPath).size < 10) {
+          await new Promise((res, rej) => {
+            const p = spawn(
+              FFMPEG_PATH,
+              ["-i", filePath, "-map", `0:${sub.index}`, "-c:s", "webvtt", vttPath, "-y"],
+              { stdio: "pipe" }
+            );
+            p.on("close", (code) => (code === 0 ? res() : rej(new Error("ffmpeg exit " + code))));
+            p.on("error", rej);
+          });
+        }
+        if (fs.existsSync(vttPath) && fs.statSync(vttPath).size > 10) {
+          results.push({
+            name: cleanLabel,
+            language: lang,
+            url: `/data/uploads/${vttFilename}`,
+            id: `sub-${i}`
+          });
+        }
+      } catch (err) {
+        console.warn("Subtitle extraction warning:", err.message);
+      }
+    }
+    resolve(results);
+  });
+}
+
+function buildAudioTrackList(probe) {
+  return (probe.audioStreams || []).map((a, i) => {
+    const lang = a.lang || "und";
+    let label = a.title || langName(lang) || ("Audio " + (i + 1));
+    return {
+      name: label,
+      language: lang,
+      id: "audio-" + i,
+      streamIndex: a.index,
+      isDefault: i === 0
+    };
+  });
+}
+
+async function autoDetectMediaTracks(filePath, baseName) {
+  if (!FFMPEG_PATH || !fs.existsSync(filePath)) {
+    return { audioTracks: [], subtitleTracks: [] };
+  }
+  try {
+    const probe = await probeMediaFile(filePath);
+    const audioTracks = buildAudioTrackList(probe);
+    const subtitleTracks = await extractSubtitleFiles(filePath, baseName);
+    return { audioTracks, subtitleTracks };
+  } catch (e) {
+    console.warn("Media auto-detect error:", e.message);
+    return { audioTracks: [], subtitleTracks: [] };
+  }
+}
 
 // Optional Cloud Database: MongoDB Atlas
 let mongoClient = null;
@@ -297,6 +447,11 @@ function getMime(filePath) {
     ".svg": "image/svg+xml",
     ".ico": "image/x-icon",
     ".webp": "image/webp",
+    ".vtt": "text/vtt; charset=utf-8",
+    ".srt": "text/plain; charset=utf-8",
+    ".mp3": "audio/mpeg",
+    ".m4a": "audio/mp4",
+    ".aac": "audio/aac",
     ".mp4": "video/mp4",
     ".webm": "video/webm",
     ".mkv": "video/x-matroska",
@@ -476,6 +631,8 @@ async function handleRequest(req, res) {
       duration: "",
       media,
       showOnHome: true,
+      audioTracks: Array.isArray(body.audioTracks) ? body.audioTracks : (body.audioTracks ? [body.audioTracks] : []),
+      subtitleTracks: Array.isArray(body.subtitleTracks) ? body.subtitleTracks : (body.subtitleTracks ? [body.subtitleTracks] : []),
     };
 
     if (isSeries) {
@@ -582,6 +739,25 @@ async function handleRequest(req, res) {
       }
 
       item.seasons = seasons;
+    }
+
+    // Auto-detect audio/subtitle tracks for local files if not already specified
+    if (item.media && (item.media.filename || (item.media.streamUrl && item.media.streamUrl.startsWith("/data/uploads/")))) {
+      const fn = item.media.filename || path.basename(item.media.streamUrl);
+      const localPath = path.join(UPLOADS_DIR, fn);
+      if (fs.existsSync(localPath)) {
+        try {
+          const detected = await autoDetectMediaTracks(localPath, item.id);
+          if ((!item.audioTracks || item.audioTracks.length === 0) && detected.audioTracks.length > 0) {
+            item.audioTracks = detected.audioTracks;
+          }
+          if ((!item.subtitleTracks || item.subtitleTracks.length === 0) && detected.subtitleTracks.length > 0) {
+            item.subtitleTracks = detected.subtitleTracks;
+          }
+        } catch (err) {
+          console.warn("Auto-detect tracks on import warning:", err.message);
+        }
+      }
     }
 
     // Avoid duplicates in items
@@ -899,6 +1075,22 @@ async function handleRequest(req, res) {
     return sendJson(res, 200, { ok: true });
   }
 
+  // --- POST /api/admin/probe-media ---
+  if (pathname === "/api/admin/probe-media" && method === "POST") {
+    if (!requireAdmin(req, res)) return;
+    const body = await parseBody(req);
+    const filename = body.filename || "";
+    if (!filename) return sendJson(res, 400, { error: "filename is required" });
+    const filePath = path.join(UPLOADS_DIR, filename);
+    if (!fs.existsSync(filePath)) return sendJson(res, 404, { error: "File not found" });
+    try {
+      const detected = await autoDetectMediaTracks(filePath, path.parse(filename).name);
+      return sendJson(res, 200, { ok: true, ...detected });
+    } catch (e) {
+      return sendJson(res, 500, { error: "Probe failed: " + e.message });
+    }
+  }
+
   // --- POST /api/admin/upload-video ---
   if (pathname.startsWith("/api/admin/upload-video") && method === "POST") {
     if (!requireAdmin(req, res)) return;
@@ -921,7 +1113,8 @@ async function handleRequest(req, res) {
     if (isComplete) {
       // Assemble chunks
       const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const finalPath = path.join(UPLOADS_DIR, `${uploadId}_${safeName}`);
+      const finalFileName = `${uploadId}_${safeName}`;
+      const finalPath = path.join(UPLOADS_DIR, finalFileName);
       const files = await fsPromises.readdir(uploadDir);
       files.sort((a, b) => {
         const aOff = parseInt(a.split("_")[1], 10);
@@ -939,11 +1132,22 @@ async function handleRequest(req, res) {
       // Clean up chunk directory
       await fsPromises.rm(uploadDir, { recursive: true, force: true });
 
-      const streamUrl = `/data/uploads/${uploadId}_${safeName}`;
+      const streamUrl = `/data/uploads/${finalFileName}`;
+
+      // Automatically probe tracks and extract embedded subtitles
+      let detectedTracks = { audioTracks: [], subtitleTracks: [] };
+      try {
+        detectedTracks = await autoDetectMediaTracks(finalPath, finalFileName);
+      } catch (err) {
+        console.warn("Probe after upload warning:", err.message);
+      }
+
       return sendJson(res, 200, {
         ok: true,
         received,
-        media: { provider: "local", streamUrl, downloadUrl: streamUrl },
+        media: { provider: "local", streamUrl, downloadUrl: streamUrl, filename: finalFileName },
+        audioTracks: detectedTracks.audioTracks,
+        subtitleTracks: detectedTracks.subtitleTracks
       });
     }
 
@@ -973,7 +1177,12 @@ async function handleRequest(req, res) {
     if (!mediaObj) return sendJson(res, 404, { error: "Media not found." });
 
     if (req.url.includes("info=1")) {
-      return sendJson(res, 200, { ok: true, media: mediaObj });
+      return sendJson(res, 200, {
+        ok: true,
+        media: mediaObj,
+        audioTracks: (item && item.audioTracks) || [],
+        subtitleTracks: (item && item.subtitleTracks) || []
+      });
     }
 
     // Handle local files specially based on provider/filename

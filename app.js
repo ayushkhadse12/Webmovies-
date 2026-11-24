@@ -2109,7 +2109,9 @@ function openPlayer(title, video = "", item = null) {
         poster: item?.poster || "",
         video: finalVideo,
         download: item?.download || finalVideo || "",
-        parts: item?.parts || 1
+        parts: item?.parts || 1,
+        audioTracks: item?.audioTracks || item?.media?.audioTracks || [],
+        subtitleTracks: item?.subtitleTracks || item?.media?.subtitleTracks || []
     };
 
     playerUrl.searchParams.set(
