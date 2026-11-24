@@ -2002,7 +2002,7 @@ async function loadServerCatalog() {
                     : (item.type || "Movie"),
                 year: item.year || (linkedItem?.year) || "",
                 rating: item.rating || (linkedItem?.rating) || "",
-                quality: item.quality || "HD",
+                quality: item.quality || "4K",
                 description: item.description || (linkedItem?.description) || "",
                 poster: item.poster,
                 video: item.video || "",
@@ -2110,6 +2110,7 @@ function openPlayer(title, video = "", item = null) {
         video: finalVideo,
         download: item?.download || finalVideo || "",
         parts: item?.parts || 1,
+        quality: item?.quality || "4K",
         audioTracks: item?.audioTracks || item?.media?.audioTracks || [],
         subtitleTracks: item?.subtitleTracks || item?.media?.subtitleTracks || []
     };

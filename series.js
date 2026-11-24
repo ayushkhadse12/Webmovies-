@@ -933,7 +933,7 @@ const server = http.createServer(async (request, response) => {
                 year: year,
                 rating: rating,
                 type: payload.type || "Movie",
-                quality: payload.quality || "HD",
+                quality: payload.quality || "4K",
                 position: position
             };
 

@@ -180,7 +180,7 @@ const defaultPlayerData = {
     type: "Movie",
     year: "2026",
     rating: "8.5",
-    quality: "HD",
+    quality: "4K",
     description: "This is the WebMovies standalone player.",
     poster: "",
     video: "test.mp4",
@@ -2126,7 +2126,7 @@ function applyPlayerData() {
 
     videoQuality.textContent =
         playerData.quality ||
-        "HD";
+        "4K";
 
 
     videoDescription.textContent =

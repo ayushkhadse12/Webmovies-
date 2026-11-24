@@ -778,7 +778,7 @@ async function handleRequest(req, res) {
         year: item.year,
         rating: item.rating,
         type: item.kind === "series" ? "Web Series" : "Movie",
-        quality: "HD",
+        quality: "4K",
         position: 0 // Put it at the front!
       };
       // Shift other slides down
