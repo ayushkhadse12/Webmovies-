@@ -1165,8 +1165,8 @@ async function handleRequest(req, res) {
     }
 
     try {
-      // Step 1: Try the confirm-bypass URL that works for large files
-      const confirmUrl = `https://drive.google.com/uc?export=download&confirm=t&id=${fileId}`;
+      // Use drive.usercontent.google.com which serves the actual file (bypasses virus scan page)
+      const confirmUrl = `https://drive.usercontent.google.com/download?id=${fileId}&export=download&confirm=t`;
       const fetchHeaders = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       };
