@@ -453,7 +453,8 @@ function getYouTubeEmbedUrl(url) {
 
 function isDriveUrl(url) {
     if (!url) return false;
-    return !!(url.includes("drive.google.com") || getDriveFileId(url));
+    // Only match actual Google Drive domains, NOT our own proxy URLs
+    return url.includes("drive.google.com") || url.includes("docs.google.com");
 }
 
 function getDriveEmbedUrl(url) {

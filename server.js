@@ -1155,23 +1155,44 @@ async function handleRequest(req, res) {
   }
 
   // --- GET /api/stream/drive ---
+  // Proxies Google Drive files so the native <video> element can play them.
+  // Handles the virus-scan confirmation page for large files.
+  // To undo: delete this entire block and Drive videos will stop proxying.
   if (pathname === "/api/stream/drive" && method === "GET") {
     const fileId = parsedUrl.searchParams.get("id");
-    if (!fileId) return sendJson(res, 400, { error: "Drive file id required." });
-
-    const driveUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
-    const headers = {};
-    if (req.headers.range) {
-      headers["range"] = req.headers.range;
+    if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
+      return sendJson(res, 400, { error: "Invalid Drive file id." });
     }
 
     try {
-      const driveRes = await fetch(driveUrl, { headers });
+      // Step 1: Try the confirm-bypass URL that works for large files
+      const confirmUrl = `https://drive.google.com/uc?export=download&confirm=t&id=${fileId}`;
+      const fetchHeaders = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      };
+      if (req.headers.range) {
+        fetchHeaders["Range"] = req.headers.range;
+      }
+
+      const driveRes = await fetch(confirmUrl, {
+        headers: fetchHeaders,
+        redirect: "follow",   // follow all 302s automatically
+      });
+
+      const ct = driveRes.headers.get("content-type") || "";
+
+      // If Drive returned HTML (virus scan page or error), tell client
+      if (ct.includes("text/html")) {
+        console.warn("Drive proxy: got HTML instead of video for id", fileId);
+        return sendJson(res, 502, { error: "Drive returned HTML instead of video. The file may not be publicly shared or may be too large." });
+      }
+
       const status = driveRes.status === 206 ? 206 : 200;
       const respHeaders = {
-        "Content-Type": driveRes.headers.get("content-type") || "video/mp4",
+        "Content-Type": ct || "video/mp4",
         "Accept-Ranges": "bytes",
         "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "public, max-age=3600",
       };
       if (driveRes.headers.get("content-length")) {
         respHeaders["Content-Length"] = driveRes.headers.get("content-length");
@@ -1189,9 +1210,8 @@ async function handleRequest(req, res) {
       }
       return res.end();
     } catch (err) {
-      // Fallback redirect to direct uc url if streaming proxy fails
-      res.writeHead(302, { Location: driveUrl });
-      return res.end();
+      console.error("Drive proxy error:", err.message);
+      return sendJson(res, 502, { error: "Failed to stream from Drive." });
     }
   }
 
