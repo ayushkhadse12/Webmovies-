@@ -1154,6 +1154,47 @@ async function handleRequest(req, res) {
     return sendJson(res, 200, { ok: true, received });
   }
 
+  // --- GET /api/stream/drive ---
+  if (pathname === "/api/stream/drive" && method === "GET") {
+    const fileId = parsedUrl.searchParams.get("id");
+    if (!fileId) return sendJson(res, 400, { error: "Drive file id required." });
+
+    const driveUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
+    const headers = {};
+    if (req.headers.range) {
+      headers["range"] = req.headers.range;
+    }
+
+    try {
+      const driveRes = await fetch(driveUrl, { headers });
+      const status = driveRes.status === 206 ? 206 : 200;
+      const respHeaders = {
+        "Content-Type": driveRes.headers.get("content-type") || "video/mp4",
+        "Accept-Ranges": "bytes",
+        "Access-Control-Allow-Origin": "*",
+      };
+      if (driveRes.headers.get("content-length")) {
+        respHeaders["Content-Length"] = driveRes.headers.get("content-length");
+      }
+      if (driveRes.headers.get("content-range")) {
+        respHeaders["Content-Range"] = driveRes.headers.get("content-range");
+      }
+
+      res.writeHead(status, respHeaders);
+      const reader = driveRes.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(value);
+      }
+      return res.end();
+    } catch (err) {
+      // Fallback redirect to direct uc url if streaming proxy fails
+      res.writeHead(302, { Location: driveUrl });
+      return res.end();
+    }
+  }
+
   // --- GET /api/media/:id (redirect to stream URL) ---
   if (pathname.startsWith("/api/media/") && method === "GET") {
     const mediaId = decodeURIComponent(pathname.slice("/api/media/".length));

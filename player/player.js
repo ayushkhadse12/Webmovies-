@@ -2228,15 +2228,24 @@ async function prepareMultiPartPlayback() {
         }
     }
 
-    // --- Google Drive detection: use iframe embed instead of <video> ---
-    if ((isDriveUrl(videoUrl) || isYouTubeUrl(videoUrl)) && driveEmbedFrame) {
-        const embedUrl = isYouTubeUrl(videoUrl) ? getYouTubeEmbedUrl(videoUrl) : getDriveEmbedUrl(videoUrl);
+    // If it's a Google Drive video, route it through our native streaming proxy so the custom player UI is used
+    if (isDriveUrl(videoUrl)) {
+        const driveId = getDriveFileId(videoUrl);
+        if (driveId) {
+            videoUrl = `/api/stream/drive?id=${encodeURIComponent(driveId)}`;
+            playerData.video = videoUrl;
+        }
+    }
+
+    // Only YouTube uses iframe embeds
+    if (isYouTubeUrl(videoUrl) && driveEmbedFrame) {
+        const embedUrl = getYouTubeEmbedUrl(videoUrl);
         if (embedUrl) {
             isDriveEmbed = true;
             videoPlayer.style.display = "none";
             secondaryVideoPlayer.style.display = "none";
 
-            // Hide poster and native controls, bring Drive player to front
+            // Hide poster and native controls, bring embed player to front
             if (videoContainer) videoContainer.classList.add("video-started");
             if (videoPoster) videoPoster.style.display = "none";
 
