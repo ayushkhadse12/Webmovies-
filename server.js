@@ -7,6 +7,7 @@ const fs = require("fs");
 const fsPromises = require("fs").promises;
 const path = require("path");
 const { spawn } = require("child_process");
+const { Readable } = require("stream");
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
 const { generateToken, verifyToken } = require("./auth");
@@ -1156,16 +1157,20 @@ async function handleRequest(req, res) {
 
   // --- GET & HEAD /api/stream/drive ---
   // Proxies Google Drive files so the native <video> element can play them.
+  // Supports seeking (Range header), backpressure, and client aborts.
   // Handles the virus-scan confirmation page for large files.
-  // To undo: delete this entire block and Drive videos will stop proxying.
   if (pathname === "/api/stream/drive" && (method === "GET" || method === "HEAD")) {
     const fileId = parsedUrl.searchParams.get("id");
     if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
       return sendJson(res, 400, { error: "Invalid Drive file id." });
     }
 
+    const abortController = new AbortController();
+    req.on("close", () => {
+      abortController.abort();
+    });
+
     try {
-      // Use drive.usercontent.google.com which serves the actual file (bypasses virus scan page)
       const confirmUrl = `https://drive.usercontent.google.com/download?id=${fileId}&export=download&confirm=t`;
       const fetchHeaders = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -1177,12 +1182,12 @@ async function handleRequest(req, res) {
       const driveRes = await fetch(confirmUrl, {
         method: method,
         headers: fetchHeaders,
-        redirect: "follow",   // follow all 302s automatically
+        redirect: "follow",
+        signal: abortController.signal
       });
 
       const ct = driveRes.headers.get("content-type") || "";
 
-      // If Drive returned HTML (virus scan page or error), tell client
       if (ct.includes("text/html")) {
         console.warn("Drive proxy: got HTML instead of video for id", fileId);
         return sendJson(res, 502, { error: "Drive returned HTML instead of video. The file may not be publicly shared or may be too large." });
@@ -1208,17 +1213,27 @@ async function handleRequest(req, res) {
         return res.end();
       }
 
-      const reader = driveRes.body.getReader();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(value);
+      if (driveRes.body) {
+        const nodeStream = Readable.fromWeb(driveRes.body);
+        nodeStream.on("error", (streamErr) => {
+          if (!abortController.signal.aborted) {
+            console.warn("Stream reading error:", streamErr.message);
+          }
+        });
+        nodeStream.pipe(res);
+      } else {
+        res.end();
       }
-      return res.end();
     } catch (err) {
+      if (abortController.signal.aborted) {
+        return; // Client cancelled / seeked away, normal behavior
+      }
       console.error("Drive proxy error:", err.message);
-      return sendJson(res, 502, { error: "Failed to stream from Drive." });
+      if (!res.headersSent) {
+        return sendJson(res, 502, { error: "Failed to stream from Drive." });
+      }
     }
+    return;
   }
 
   // --- GET /api/media/:id (redirect to stream URL) ---

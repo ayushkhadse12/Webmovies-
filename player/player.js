@@ -517,7 +517,11 @@ function updateTimeDisplay() {
     timeDisplay.textContent = `${current} / ${duration}`;
 }
 
+let isUserSeeking = false;
+let seekDebounceTimeout = null;
+
 function updateProgress() {
+    if (isUserSeeking) return; // Don't fight user finger/mouse while scrubbing
     const total = getCombinedTotalDuration();
     if (!total) {
         progressBar.value = 0;
@@ -734,16 +738,26 @@ forwardButton.addEventListener(
 progressBar.addEventListener(
     "input",
     function () {
-
+        isUserSeeking = true;
         const duration = getCombinedTotalDuration();
         if (!duration) {
             return;
         }
 
         const percentage = Number(progressBar.value);
+        progressBar.style.setProperty("--progress", `${percentage}%`);
         const targetTime = (percentage / 100) * duration;
-        seekCombinedTime(targetTime);
+        
+        // Update time display in real-time as user drags
+        const current = formatTime(targetTime);
+        const durStr = formatTime(duration);
+        timeDisplay.textContent = `${current} / ${durStr}`;
 
+        // Debounce actual seek so we don't spam the server on every pixel movement
+        clearTimeout(seekDebounceTimeout);
+        seekDebounceTimeout = setTimeout(() => {
+            seekCombinedTime(targetTime);
+        }, 80);
     }
 );
 
@@ -751,9 +765,17 @@ progressBar.addEventListener(
 progressBar.addEventListener(
     "change",
     function () {
-
+        clearTimeout(seekDebounceTimeout);
+        const duration = getCombinedTotalDuration();
+        if (duration) {
+            const percentage = Number(progressBar.value);
+            const targetTime = (percentage / 100) * duration;
+            seekCombinedTime(targetTime);
+        }
+        setTimeout(() => {
+            isUserSeeking = false;
+        }, 150);
         savePlaybackPosition();
-
     }
 );
 
