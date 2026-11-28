@@ -2267,6 +2267,7 @@ async function prepareMultiPartPlayback() {
     activePlayer.src = getPartUrl(0);
     activePlayer.style.display = "block";
     inactivePlayer.style.display = "none";
+    try { activePlayer.load(); } catch (_) {}
 
     setupVideoEvents(activePlayer);
     setupVideoEvents(inactivePlayer);
@@ -2297,6 +2298,12 @@ function fetchPartDuration(index) {
         tempVid.onerror = reject;
         tempVid.src = getPartUrl(index);
     });
+}
+
+function hidePoster() {
+    if (videoPoster) {
+        videoPoster.style.display = "none";
+    }
 }
 
 function setupVideoEvents(playerEl) {

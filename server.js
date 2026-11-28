@@ -1154,11 +1154,11 @@ async function handleRequest(req, res) {
     return sendJson(res, 200, { ok: true, received });
   }
 
-  // --- GET /api/stream/drive ---
+  // --- GET & HEAD /api/stream/drive ---
   // Proxies Google Drive files so the native <video> element can play them.
   // Handles the virus-scan confirmation page for large files.
   // To undo: delete this entire block and Drive videos will stop proxying.
-  if (pathname === "/api/stream/drive" && method === "GET") {
+  if (pathname === "/api/stream/drive" && (method === "GET" || method === "HEAD")) {
     const fileId = parsedUrl.searchParams.get("id");
     if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
       return sendJson(res, 400, { error: "Invalid Drive file id." });
@@ -1175,6 +1175,7 @@ async function handleRequest(req, res) {
       }
 
       const driveRes = await fetch(confirmUrl, {
+        method: method,
         headers: fetchHeaders,
         redirect: "follow",   // follow all 302s automatically
       });
@@ -1189,7 +1190,8 @@ async function handleRequest(req, res) {
 
       const status = driveRes.status === 206 ? 206 : 200;
       const respHeaders = {
-        "Content-Type": ct || "video/mp4",
+        "Content-Type": (ct && !ct.includes("octet-stream")) ? ct : "video/mp4",
+        "Content-Disposition": "inline",
         "Accept-Ranges": "bytes",
         "Access-Control-Allow-Origin": "*",
         "Cache-Control": "public, max-age=3600",
@@ -1202,6 +1204,10 @@ async function handleRequest(req, res) {
       }
 
       res.writeHead(status, respHeaders);
+      if (method === "HEAD") {
+        return res.end();
+      }
+
       const reader = driveRes.body.getReader();
       while (true) {
         const { done, value } = await reader.read();
